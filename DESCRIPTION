@@ -8,8 +8,8 @@ Authors@R: c(person("Seba", "De Bona", email = "sebastiano.debona@gmail.com",
             )
 Description: This package containes the analyses to study the effects of a density manipulation experiment on dispersal, habitat quality and diet, using wild guppy populations in Trinidadian streams.
 License: MIT License
-URL: https://gitlab.com/sebadebona/density-manipulation-experiment
-BugReports: https://gitlab.com/sebadebona/density-manipulation-experiment/issues
+URL: https://sebastianodebona.github.io/guppyDme/
+BugReports: https://sebastianodebona.github.io/guppyDme/issues
 Encoding: UTF-8
 LazyData: true
 Imports: 
