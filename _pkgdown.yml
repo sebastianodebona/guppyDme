@@ -1,36 +1,4 @@
 url: https://sebastianodebona.github.io/guppyDme/
-home:
-  links:
-  - text: Browse source code at
-    href: https://gitlab.com/sebadebona/guppyDME
 template:
-  params:
-    bootswatch: flatly
-navbar:
-  left:
-  - icon: fa-home fa-lg
-    href: index.html
-  - text: Reference
-    href: reference/index.html
-  - text: Analyses
-    menu:
-    - text: Tidy the Data
-      href: articles/DME-000_Tidy_data.html
-    - text: Measurement Consistency
-      href: articles/DME-011_Measurement_consistency.html
-    - text: Habitat Characteristics
-      href: articles/DME-010_Habitat_characteristics.html
-    - text: Habitat Area
-      href: articles/DME-015_Habitat_area.html
-    - text: Dispersal and Habitat shift
-      href: articles/DME-016_Dispersal_and_habitat_shift.html
-    - text: Density Dependence
-      href: articles/DME-020_Density_dependence.html
-    - text: Habitat Use
-      href: articles/DME-030_Habitat_use.html
-    - text: Density-Dependent Habitat Use
-      href: articles/DME-035_DD_habitat_use.html
-  right:
-  - icon: fa-github fa-lg
-    href: https://gitlab.com/sebadebona/guppyDME
+  bootstrap: 5
 
