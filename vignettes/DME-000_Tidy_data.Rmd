@@ -1,0 +1,340 @@
+---
+title: "Tidy the data"
+author: "Seba De Bona"
+date: ""
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 4
+    theme: flatly
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overwiew & setup
+
+This vignette handles data to obtain individual information across the two recaptures, such as dispersal, habitat shift, and growth.
+
+```{r packages and data, message = F, warning = F}
+# loading necessary packages
+library(tidyverse)
+library(magrittr)
+
+# this requires the package guppyDme to be installed. If the user wishes not to install the package, please comment out the "library(guppyDme)" line and run instead the lines commented out below
+
+#### If you have the guppyDme package installed
+# loading package
+library(guppyDme)
+
+# # If you do NOT wish to install the guppyDme package, please uncomment and run the following two lines of code, adding the package functions to the Global Environment and loading the data
+# source(file.path(here::here(), "R", "package_functions.R"))
+# load(file.path(here::here(), "data", "DMEdata.rda"))
+
+# loading data
+data <- DMEdata
+str(data)
+
+# including sex_stage variable and converting size into numeric
+data %<>%
+  mutate(SL = as.numeric(SL),
+         sex_stage = score_sexst(., f_threshold = 14.00, f_unit = "SL"))
+# I am here using the SL as a unit of threshold, since individuals preserved
+# in formaline don't have weight information
+
+# checking which individuals are missing a capture location
+data %>% 
+  filter(is.na(patchID))
+# these individuals belong to two bottles that were accidentally mixed during processing.
+# individuals in it were not included in the experiment
+```
+
+## Spreading and shrinking the data
+
+To analyse dispersal and habitat change we need to transform the dataset from long to wide format (spread), reducing it to the recaptured individuals only.
+
+```{r spread data}
+captures <- data %>%
+# we are here selecting all individuals that are not babies, cohort or in TM
+  filter(recap == 0, !isbabyMark, !isCohort, streamID != "TM") %>%
+  select(markID, streamID, treatment, sex_stage_0 = sex_stage,
+         patch_0 = patchID, habitat_0 = habitat,
+         SL_0 = SL, weight_0 = weight, releaseDate, marker_0 = markerID)
+  
+recaptures <- data %>%
+  filter(recap == 1, !isbabyMark, !isCohort) %>%
+  select(markID, 
+         patch_1 = patchID, habitat_1 = habitat, sex_stage_1 = sex_stage,
+         SL_1 = SL, weight_1 = weight, captureDate, marker_1 = markerID)
+
+# merging, but keeping only markIDs that are shared among the two datasets
+# (only recaptured individuals)
+cr_data <- inner_join(captures, recaptures, by = "markID")
+str(cr_data)
+```
+
+There are `r nrow(cr_data)` recapture events (out of `r nrow(captures)` adults captured).
+
+Let's see how many individuals per treatment we are dealing with.
+
+```{r}
+cr_data %>%
+  group_by(treatment) %>%
+  count()
+
+cr_data %>%
+  filter(is.na(treatment))
+```
+
+
+So far we've only dealt with adult individuals with a unique mark. For cohort marks (i.e. individuals between 10 and 13 mm who received only a single mark, assigning it to a size cohort, pool and habitat), we need to take a different approach.
+
+Cohort marks do not have unique marks, so we have to back-track their information at capture (where they were, how long they were to 1mm error, which habitat they were found in) based on that mark. 
+
+Once we've done this, we can add this information to the one concerning the adults.
+
+There are a few things to consider while subsetting for cohort marks. Individuals that were removed from the decreased density pool are also marked with a cohort mark (`"1R"`, `"1RX"`, `"3R"` or `"1R2R"`). So we'll need not to consider these individuals.
+
+Moreover, cohort marks given to individuals in the N treatment (natural untouched pools) or added in the increased pool (E treatment) were given a pool-specific only mark, with individuals from different habitats and size classes sharing the same mark.
+
+```{r}
+# first, extracting information on capture
+cohort_captures <- data %>%
+  filter(recap == 0, 
+         isCohort, !(markID %in% c("1R", "1RX", "1R2R", "3R")),
+         streamID != "TM",
+         !(treatment %in% c("R", "E", "N")) )
+```
+
+Each cohort mark should have been used in only one pool by size class by habitat combination.
+Let's check whether this is true.
+
+```{r}
+reused_marks <- cohort_captures %>%
+  # dividing in categorical size classes
+  mutate(size_class = cut(as.numeric(SL), breaks = c(10, 11, 12, 13))) %>%
+  group_by(markID, stream, patchID, habitat, size_class) %>%
+  summarise() %>%
+  group_by(markID, stream) %>%
+  # the following code pulls out the markID which are repeated for more than one
+  # habitat-size-pool combination in a stream.
+  nest() %>%
+  mutate(n = (map(data, nrow))) %>%
+  filter(n > 1) %>%
+  select(markID, stream) %T>%
+  print
+```
+
+We can now filter away the reused mark, and extract the pool, habitat, position, and mean SL, together with the other information to match it with the adults'.
+
+```{r}
+mean_SL <- cohort_captures %>%
+  filter(!(markID %in% reused_marks$markID & stream %in% reused_marks$stream)) %>%
+  group_by(markID, streamID) %>%
+  summarise(SL_0 = mean(as.numeric(SL), na.rm = T))
+NROW = nrow(mean_SL)
+
+cohort_captures %<>%
+  # removing reused marks
+  filter(!(markID %in% reused_marks$markID & stream %in% reused_marks$stream)) %>%
+  # extracting only unique combinations (which should match the mean_SL)
+  distinct(markID, streamID, stream, treatment, sex_stage_0 = sex_stage,
+         patch_0 = patchID, habitat_0 = habitat, releaseDate)
+# checking whether we did obtain only unique rows, matching mean_SL
+stopifnot(nrow(cohort_captures) == NROW)
+# merging (and adding a column of NAs for the initial weight)
+cohort_captures <- left_join(cohort_captures, mean_SL) %>%
+  add_column(weight_0 = NA)
+```
+
+Similarly to what was done for the adults, we can extract the data for the recaptures, and merge the capture data into it. We don't need here to remove any mark yet, since we will inner merge so all marks we already removed from the capture data (reused marks, removed individuals) will be dropped here.
+
+```{r}
+cohort_recaptures <- data %>%
+  filter(recap == 1, isCohort) %>%
+  select(markID, 
+         stream, patch_1 = patchID, habitat_1 = habitat, sex_stage_1 = sex_stage,
+         SL_1 = SL, weight_1 = weight, captureDate)
+
+# merging
+cr_cohorts <- inner_join(cohort_captures, cohort_recaptures, by = c("markID", "stream"))
+```
+
+We now need to be careful, before adding the rows for the cohort individuals, to have the same variables in the cohort dataset.
+
+```{r}
+# checking if any variable that is present in cr_data is missing
+# in cr_cohorts
+table(is.na(match(colnames(cr_data), colnames(cr_cohorts))))
+# no variables missing
+
+# now checking if there are extra variables in cr_cohorts that are not in cr_data
+extra_var <- colnames(cr_cohorts)[is.na(match(colnames(cr_cohorts), colnames(cr_data)))]
+
+# before proceeding I need to remove this variable(s)
+cr_cohorts %<>%
+  select(-all_of(extra_var))
+```
+
+Now we can add the rows to the main dataset `cr_data`.
+
+```{r}
+cr_data <- bind_rows(cr_data, cr_cohorts)
+```
+
+
+It's useful to know what was the *pool-specific* habitat of the patch individuals move to or from. For instance, individuals could be released in a specific treatment (control, increased, decreased) and move to a different pool with anther treatment.
+
+```{r}
+# for the starting pool is fine, since the pool treatment can be
+# derived from the individual treatment
+cr_data %<>%
+  mutate(pool_treat_0 = str_replace_all(treatment,
+                                        c("C" = "control",
+                                          "D" = "decreased",
+                                          "I" = "increased",
+                                          "E" = "increased",
+                                          "N" = "natural")),
+         pool_treat_0 = ifelse(is.na(pool_treat_0), "natural", pool_treat_0))
+
+# for the arrival pool is a little trickier. I need to create
+# a key that matches pools to their treatment type.
+pool_to_treat <- as_tibble(
+  cr_data %>%
+    filter(treatment %in% c("C", "I", "D")) %>%
+    group_by(streamID, patch_0, treatment) %>%
+    summarise())
+
+# Now I can transform the treatment into its spelled-out form
+# and add it to the cr_data for the recapture pools
+ptt_table <- pool_to_treat %>%
+  mutate(pool_treat_1 = str_replace_all(treatment,
+                                        c("C" = "control",
+                                          "D" = "decreased",
+                                          "I" = "increased"))) %>%
+  ungroup() %>%
+  select(patch_1 = patch_0, pool_treat_1)
+# I here removed treatment and renamed the pool (0 to 1) to ease the merge
+# pool_0 was used to extract the type of treatment, by now I need to apply
+# that treatment to the arrival pool (1)
+# I also removed streamID, to account for fish that moved from CL1 to CL2.
+# pool names cannot be confounded between streams in any case.
+
+# merging pool_treat_1 info and replacing NAs (all that is not control, increased
+# or decreased) with "natural"
+cr_data %<>%
+  left_join(ptt_table) %>%
+  mutate(pool_treat_1 = ifelse(is.na(pool_treat_1), "natural", pool_treat_1))
+```
+
+There is one more necessary change to avoid confusion. The variable `patch_0` is extracted from the main dataset and refer to the location where an individual was *captured*. In the case of extra-limital individuals that were introduced in the increased-density pool, this of course does not correspond to the location where individuals were released. This would be, in fact, the increased density pool. Leaving patch_0 as it is now will cause us to overestimate dispersal, considering a dispersal event when individuals were artificially moved from "PEX" to the increased density pool.
+This will not be a problem, as long as we exclude the extra-limital individuals (treatment "E") from the analysis, as we should. But just in case, lets fix it.
+
+```{r}
+# checking which are the increased pools
+pool_to_treat %>%
+  filter(treatment == "I")
+
+# replacing PEX with actual release pool
+cr_data %<>%
+  mutate(patch_0 = ifelse(str_sub(patch_0, 1, 3) == "PEX",
+                          paste("PEX", streamID, sep = "-"),
+                          as.character(patch_0))) %>%
+  mutate(patch_0 = str_replace_all(patch_0,
+                                   c("PEX-CL1" = "P10-15",
+                                     "PEX-CL2" = "P53.5-56",
+                                     "PEX-TL" = "P24-29.5")
+                                   ))
+```
+
+
+## Growth, dispersal, habitat shift
+
+We can now check whether individuals have dispersed or changed habitat in the time between the two captures. We can also estimate the growth in mm, and the time between capture and recapture. We can calculate time in days comparing the release time after the first capture with the capture time of the recapture.
+
+```{r}
+# an individual is considered dispersed if the patch ID between 0 and 1 (cap and recap)
+# is different. Since in the prep-data step we have established unique patchIDs between
+# capture and recapture event, this correponds to an actual movement.
+cr_data %<>%
+  mutate(moved = patch_0 != patch_1,
+         hshift = habitat_0 != habitat_1,
+         interval = captureDate - releaseDate,
+         growth = as.numeric(as.character(SL_1)) - as.numeric(as.character(SL_0))
+         )
+```
+
+
+The last necessary step is to calculate the actual percentages of increase and decrease in density over the treatments. The aim of the manipulation was to modify density by 40 (CL1), 50 (TL) and 60% (CL2). But the actual proportion can be calculated from the capture form.
+
+Before proceeding, here explained what the treatment levels (quite a few) mean:
+
+* C:    control treatment. Fish assigned to this treatment were captured and released in the same control pool. Density here is unaltered.
+* I:    increased treatment. Fish captured in the pool to be increased. This are the resident fish, which would be reintroduced in the increased density pool, together with other fish (see below). The analyses of the effects of density will be restricted to these resident fish, experiencing higher density.
+* E:    extralimital fish. Fish captured elsewhere (outside the manipulated reach), to be introduced in the increased treatment. The analyses won't concern this fish since they're movement is likely to be affected by them being displaced, in addition to density.
+* D:    decreased fish. Fish captured in the pool where density will be decreased, and that will be released back into the same pool. These are the resident fish that stay, to experience to lower density.
+* R:    removed fish. Fish captured in the pool where density will be decreased, but that won't be released back into the same pool. They will be displaced downstream, allowing a decrease in density.
+* XR:    accidentally removed fish. In TL two bottles belonging to different pools were mixed together by accident, in the laboratory. These 20+27 fish were removed from the reach. The pool marked XR are the fish that are considered as removed from the decreased density pool (one of the mixed up pools). These fish will be counted when establishing how many fish were removed from TL.
+* X:    accidentally removed fish, from the increased density pool. These fish were also mixed up (see above). We had to remove them from the increased pool. These fish will be counted when establishing the original density of the increased pool in TL.
+
+
+```{r}
+# we only need capture data
+all_capture <- data %>%
+  filter(recap == 0, streamID != "TM")
+```
+
+We can now summarise the data by `streamID` and `treatment`, and transform into a wide format
+
+```{r}
+treatment_tab <- all_capture %>%
+  filter(!is.na(treatment)) %>%
+  group_by(streamID, treatment) %>%
+  count %>%
+  spread(treatment, n) %>%
+  print
+
+# with operations among columns I can now calculate increase and decrease percentages.
+treatment_tab %<>%
+  mutate(Incr_p = round(sum(I, E)/sum(I, X, na.rm = T), 2),
+         Decr_p = round(D/sum(D, R, XR, na.rm = T), 2)) %>%
+  print
+# see above what is the meaning of the treatment levels here
+```
+
+We can reshape this table in a better way to facilitate merging.
+
+
+```{r}
+treatment_tab %<>%
+  select(streamID, Incr_p, Decr_p) %>%
+  mutate(Contr_p = 1) %>% # the control was always left intact
+  gather(treatment, density_factor, Incr_p:Contr_p) %>% # wide to long format
+  mutate(treatment = str_replace_all(treatment, # using same nomenclature as treatment levels
+                                     c("Incr_p" = "I",
+                                     "Decr_p" = "D",
+                                     "Contr_p" = "C"))) %>%
+  print
+  
+#...and merge
+cr_data <- left_join(cr_data, treatment_tab)
+str(cr_data)
+
+# the info on pool-specific treatment is useful to have here too
+# so we will merge it into this
+head(treatment_tab <- left_join(pool_to_treat %>% rename(patchID = patch_0), treatment_tab))
+```
+
+The newly added variable `density_factor` allows to use density as a continous variable in the analyses.
+
+
+## Saving
+
+```{r}
+# saving the cr dataset
+saveRDS(cr_data, file = file.path(here::here(), "vignettes", "DME_cr_data.rds"))
+# and also the treatment table
+saveRDS(treatment_tab, file = file.path(here::here(), "vignettes", "DME_density_factor_in_treatments.rds"))
+```

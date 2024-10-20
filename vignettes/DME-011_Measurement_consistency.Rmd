@@ -1,0 +1,68 @@
+---
+title: "Measurement consistency"
+author: "Seba De Bona"
+date: ""
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 4
+    theme: flatly
+---
+
+```{r setup, include = F}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Here we briefly test if there is an effect of the `markerID` on the length measured, i.e. whether there are consistent biases in the measures of length. This is an important check to insure growth is measured accurately.
+
+```{r}
+library(tidyverse)
+library(magrittr)
+
+# this vignette requires the package guppyDme to be installed. If the user wishes not to install the package, please comment out the "library(guppyDme)" line and run instead the lines commented out below
+
+#### If you have the guppyDme package installed
+# loading package
+library(guppyDme)
+
+# # If you do NOT wish to install the guppyDme package, please uncomment and run the following two lines of code, adding the package functions to the Global Environment and loading the data
+# source(file.path(here::here(), "R", "package_functions.R"))
+# load(file.path(here::here(), "data", "DMEdata.rda"))
+
+data <- DMEdata
+cr_data <- readRDS(file.path(here::here(), "vignettes", "DME_cr_data.rds"))
+```
+
+Let's see how many marking events there are, sorted by capture/recapture, and check if any difference in the average length measured is visible, and if it's significant.
+
+
+```{r}
+table(data$markerID, data$recap)
+
+data %<>%
+  mutate(SL = as.numeric(SL))
+
+ggplot(data, aes(x = markerID, y = SL)) +
+  geom_boxplot()
+
+m <- lme4::lmer(SL ~ markerID + as.factor(recap) +
+                  (1|markID) + (1|streamID),
+                data = data)
+summary(m)
+car::Anova(m, type = "III")
+```
+To check if biases could affect the growth measure, we will observe the average difference in length, before and after, for individuals measured twice by either the same or different observers.
+
+```{r}
+cr_data %<>%
+  mutate(m_srs = str_c(marker_0, marker_1, sep = "-")) %>%
+  filter(!is.na(m_srs))
+
+unique(cr_data$m_srs)
+
+ggplot(cr_data, aes(x = m_srs, y = growth)) +
+  geom_boxplot()
+```
+
+There is definitely an effect of the series of markers, so it will have to be accounted for in the analyses.

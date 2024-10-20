@@ -1,0 +1,866 @@
+---
+title: "Density dependence"
+author: "Seba De Bona"
+date: ""
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 4
+    theme: flatly
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview & Setup
+
+This vignette evaluates the effects of density manipulation on fitness proxies such as recruitment in the pool, growth, and condition.
+
+Density dependence should lower some (or all) of these life-history traits when density is increased, and viceversa when it's decreased.
+
+```{r, warning = F, messages = F}
+library(tidyverse)
+library(magrittr)
+library(car)
+library(lme4)
+library(lmerTest)
+library(ggpubr)
+
+# this vignette requires the package guppyDme to be installed. If the user wishes not to install the package, please comment out the "library(guppyDme)" line and run instead the lines commented out below
+
+#### If you have the guppyDme package installed
+# loading package
+library(guppyDme)
+
+# #### If you do NOT wish to install the guppyDme package, please uncomment and run the following two lines of code, adding the package functions to the Global Environment and loading the data
+# source(file.path(here::here(), "R", "package_functions.R"))
+# load(file.path(here::here(), "data", "DMEdata.rda"))
+
+# loading the necessary data
+data <- DMEdata %>%
+  mutate(sex_stage = score_sexst(., f_threshold = 14, f_unit = "SL"),
+         sex_stage = factor(sex_stage, levels = c("I", "M", "F")))
+cr_table <- readRDS(file.path(here::here(), "vignettes", "DME_cr_data.rds"))
+treatment_tab <- readRDS(file.path(here::here(), "vignettes",
+                                   "DME_density_factor_in_treatments.rds"))
+```
+
+To make the interpretation of the following analyses easier, we will center the variable `density_factor` (representing by how much, proportionally, density was modified) to 1. This way, all intercepts will refer to what happened in the control treatment.
+We will also filter out the pools that were not part of the experiment, and therefore that we are not interested in.
+
+Since multiple authors took the measurements of standard length, to account for any bias in measurement we will include as a random factor in the models for growth the sequence of individuals who measured the fish in the capture and recapture instance. 
+
+```{r}
+cr_table %<>%
+  filter(treatment %in% c("C", "D", "I")) %>%
+  mutate(density_factor = density_factor - 1,
+         marker_seq = str_c(marker_0, marker_1, sep = "-"),
+         treatment = factor(treatment, levels = c("C", "D", "I")))
+```
+
+
+## Growth
+
+### Growth & Dispersal
+
+For growth, we will consider the effect of density manipulation on the change in standard length (SL) with a *Linear mixed model*. We will include whether an individuals has moved or not as a covariate, to compare the effect of dispersal on growth (testing whether dispersal is beneficial or not). Density factor is now centered on 1, so in the intercept we have the control pool (for which density factor was 1).
+
+To standardize growth across different streams, where fish were left for different amounts of time, we will analyse growth over thirty days. We will also scale SL, so the intercept does not refer to 0 length, but the average length.
+
+`Stream_ID` will be included as a random factor to account for differences in slope, shading etc. A factor that accounts for the sequence of authors who measured the fish will be included to rule out biases in SL measure.
+
+```{r}
+cr_table %<>%
+  mutate(growth_30 = growth*30/as.numeric(interval))
+cr_table %>%
+  filter(growth_30 > 10)
+# the individual recaptured after 9 days has a recorded growth which is unbelievable 
+# when extrapolated. This can be due to undermeasuring, followed by overmeasuring,
+# and then extrapolated from the early growth. I will remove this individual.
+cr_table %<>%
+  filter(growth_30 < 10) %>%
+  mutate(SL_0s = scale(SL_0))
+
+g0 <- lmer(growth_30 ~ SL_0s*moved*density_factor  +
+                   (1|streamID) + (1|marker_seq),
+                data = cr_table %>% filter(sex_stage_0 == "I"),
+                na.action = na.omit)
+# the three way interaction is not significant and can be dropped
+g1 <- lmer(growth_30 ~ (SL_0s+moved+density_factor)^2 +
+                   (1|streamID) + (1|marker_seq),
+                data = cr_table,
+                na.action = na.omit)
+# dropping SL x density
+g2 <- lmer(growth_30 ~ SL_0s*moved + moved*density_factor +
+                   (1|streamID) + (1|marker_seq),
+                data = cr_table,
+                na.action = na.omit)
+# dropping moved x density
+g3 <- lmer(growth_30 ~ SL_0s*moved + density_factor +
+                   (1|streamID) + (1|marker_seq),
+                data = cr_table,
+                na.action = na.omit)
+```
+```{r, results="asis"}
+# stargazer needs objects that belong to lmer class, not lmerTest
+class(g0) <- class(g1) <- class(g2) <- class(g3) <- "lmerMod"
+stargazer::stargazer(g0, g1, g2, g3,
+                     type = "html", report = ('vcp*'),
+                     title  = "Model selection (continous density)",
+                     dep.var.labels = 'Growth (mm/month)',
+                     column.sep.width = "10pt",
+                     omit.stat = c("bic"),
+                     star.char = c('.', '*', '**'))
+```
+
+Smaller individuals who stay grow more compared to larger ones, hence the negative effect of initial standard length. Among the individuals who stay, higher densities cause growth to be lower. Individuals that disperse have lower growth compared to those who stay, if they are small. Larger individuals that disperse (from any treatment), on the other hand, grow more.
+
+To make sure we are not missing non-linear effects of the treatment, we will run the same model with density expressed as a factor (`treatment`).
+
+```{r}
+g0b <- lmer(growth_30 ~ SL_0s*moved*treatment +
+                   (1|streamID) + (1|marker_seq),
+                data = cr_table,
+                na.action = na.omit)
+# 3-way can be dropped
+g1b <- lmer(growth_30 ~ (SL_0s+moved+treatment)^2 +
+                   (1|streamID) + (1|marker_seq),
+                data = cr_table,
+                na.action = na.omit)
+```
+```{r, results = "asis"}
+class(g0b) <- class(g1b) <- "lmerMod"
+stargazer::stargazer(g0b, g1b,
+                     type = "html", report = ('vcp*'),
+                     title  = "Model selection (factorial treatments)",
+                     dep.var.labels = 'Growth (mm/month)',
+                     column.sep.width = "10pt",
+                     omit.stat = c("bic"),
+                     star.char = c('.', '*', '**'))
+
+```
+```{r}
+AIC(g3, g1b)
+```
+
+When treatment is included as a factor variable, the best fit model changes. The AIC difference though is > 4, so we will pick the model with density as a continuous factor.
+Below are some plots to visualize the results.
+
+```{r}
+alpha <- summary(g3)$coefficients["(Intercept)", "Estimate"]
+b_size <- summary(g3)$coefficients["SL_0s", "Estimate"]
+
+cr_table %<>%
+  mutate(pred_growth = alpha + b_size*SL_0s,
+         res = growth_30 - pred_growth)
+alt_data <- cr_table %>%
+  mutate(treatment = plyr::mapvalues(treatment,
+                                     c("D", "C", "I"),
+                                     c("decreased", "control", "increased")),
+         treatment = factor(treatment, levels=c("decreased", "control", "increased")),
+         boxplot_position = case_when(
+           treatment == "decreased" ~ -0.5,
+           treatment == "control" ~ 0,
+           treatment == "increased" ~ 0.5
+         ))
+
+pres <- ggplot(alt_data, 
+               aes(x = density_factor, y = res, group = treatment)) +
+  geom_hline(yintercept = 0, 
+             linetype = "dashed", 
+             linewidth = 0.4) +
+  ylab("Growth residuals") + xlab("Proportional change in density") +
+  geom_boxplot(aes(x = boxplot_position,
+                   y = res,
+                   fill = treatment),
+               alpha = 0.5,
+               outliers = F,
+               coef = 0) +
+  geom_jitter(aes(shape=treatment, 
+                  fill = treatment), 
+              position=position_jitter(0.03), 
+              alpha = .75) +
+  scale_shape_manual(values = c(25, 22, 24)) +
+  scale_x_continuous(breaks = c(-0.5, 0, 0.5)) +
+  scale_fill_manual(values = c("#ffb14e", "#cd34b5", "#0000ff")) +
+  #scale_color_manual(values = c("#ffb14e", "#cd34b5", "#0000ff")) +
+  theme_bw() +
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.80,0.85), 
+        legend.background = element_rect(fill = "transparent"),
+        plot.margin = unit(c(0.5,1.5,0.5,1), "lines"))
+
+# now plotting size x moved interaction on growth
+sls <- modelr::seq_range(cr_table$SL_0, n = 50)
+ds <- 0
+mv <- c(FALSE, TRUE)
+
+newdata <- expand.grid(SL_0 = sls,
+                       moved = mv,
+                       density_factor = ds) %>%
+  mutate(SL_0s = (SL_0 - attr(cr_table$SL_0s, "scaled:center"))/
+                    attr(cr_table$SL_0s, "scaled:scale"),
+         dispersed = plyr::mapvalues(moved,
+                                     c(TRUE, FALSE),
+                                     c("YES", "NO")),
+         dispersed = factor(dispersed))
+
+newdata %<>%
+  add_column(pred = predict(g3, newdata = newdata, re.form = ~0))
+
+alt_data <- cr_table %>%
+  mutate(dispersed = plyr::mapvalues(moved,
+                                     c(TRUE, FALSE),
+                                     c("YES", "NO")),
+         dispersed = factor(dispersed))
+
+plen <- ggplot(alt_data, aes(x = SL_0, y = growth_30, group)) +
+  ylab("Growth (mm/month)") + xlab("Initial standard length (mm)") +
+  geom_point(alpha = .75, aes(shape = dispersed,
+                             col = dispersed)) +
+  geom_line(data = newdata, aes(x = SL_0, y = pred, 
+                                linetype = dispersed,
+                                color = dispersed),
+            size = 0.5) +
+  scale_shape_manual(values = c(21, 8)) +
+  scale_color_manual(values = c("#fa8775", "#9d02d7")) +
+  theme_bw() +
+  theme(legend.position = "inside",
+    legend.position.inside = c(0.85, .85),  
+    legend.background = element_rect(fill = "transparent"),
+    plot.margin = unit(c(0.5,1.5,0.5,1), "lines"))
+  
+
+ggarrange(pres, plen, labels = c("a", "b"))
+
+jpeg(file.path(here::here(), "vignettes", "figures", "growth_by_treatment_and_dispersal.jpeg"),
+     width = 8, height = 4.5, units = "in", res = 400)
+ggarrange(pres, plen, labels = c("a", "b"))
+dev.off()
+```
+
+Plotted on the left are, on the y axis, the residual growth values when standard length alone is ruled out. This is done by calculating the predicted growth of individuals of a given standard length.
+
+
+### Growth & Habitat change
+
+It might be interesting to check for effects of *habitat shift* on growth for individuals who remain. We might expect that individuals who moved to a different habitat would grow more. If the opposite is true, this could suggest individuals being forced into suboptimal habitats and paying the consequences in terms of growth.
+
+```{r}
+# we'll try to model with density as a continuous variable first
+gh0 <- lmer(growth_30 ~ SL_0s*hshift*density_factor +
+                   (1|streamID) + (1|marker_seq),
+                data = cr_table %>% filter(!moved),
+                na.action = na.omit)
+# 3-way can go
+gh1 <- lmer(growth_30 ~ (SL_0s+hshift+density_factor)^2 +
+                   (1|streamID) + (1|marker_seq),
+                data = cr_table %>% filter(!moved),
+                na.action = na.omit)
+# hshift x density can go
+gh2 <- lmer(growth_30 ~ SL_0s*hshift+ SL_0s*density_factor +
+                   (1|streamID) + (1|marker_seq),
+                data = cr_table %>% filter(!moved),
+                na.action = na.omit)
+# SL x density
+gh3 <- lmer(growth_30 ~ SL_0s*hshift + density_factor +
+                   (1|streamID) + (1|marker_seq),
+                data = cr_table %>% filter(!moved),
+                na.action = na.omit)
+# SL x hshift
+gh4 <- lmer(growth_30 ~ SL_0s + hshift + density_factor +
+                   (1|streamID) + (1|marker_seq),
+                data = cr_table %>% filter(!moved),
+                na.action = na.omit)
+
+
+
+# and With density as a factor
+gh0b <- lmer(growth_30 ~ SL_0s*treatment*hshift +
+                   (1|streamID) + (1|marker_seq),
+                data = cr_table %>% filter(!moved),
+                na.action = na.omit)
+
+AIC(gh4, gh0b)
+# the difference in AIC is small, so I will consider the most complex model
+summary(gh0b)
+summary(gh4)
+```
+
+Let's plot the data together with the predictions from the factorial treatment model.
+
+```{r}
+tts <- levels(cr_table$treatment)
+hs <- c("NO", "YES")
+
+newdata_hab <- expand.grid(SL_0 = sls,
+                       hshift = hs,
+                       treatment = tts) %>%
+  mutate(SL_0s = (SL_0 - attr(cr_table$SL_0s, "scaled:center"))/
+                    attr(cr_table$SL_0s, "scaled:scale"),
+         hshift = factor(hshift),
+         treatment_f = factor(treatment, levels = c("D", "C", "I"))) %>%
+  add_column(hab_pred = predict(gh0b, newdata = ., re.form = ~0))
+  
+alt_data <- cr_table %>%
+  mutate(treatment_f = factor(treatment, levels = c("D", "C", "I")),
+         hshift = plyr::mapvalues(hshift,
+                                  c(FALSE, TRUE),
+                                  c("NO", "YES")),
+         hshift = factor(hshift, levels = levels(newdata_hab$hshift)))
+  
+labelss_treat <- c("D" = "decreased",
+                   "C" = "control",
+                   "I" = "increased")
+
+pgh <- ggplot(alt_data %>% filter(!is.na(hshift)), aes(x = SL_0, y = growth_30)) +
+  ylab("Growth (mm/month)") + xlab("Initial standard length (mm)") +
+  geom_point(alpha = 1, 
+             aes(shape = hshift,
+                 color = hshift)) +
+  scale_shape_manual(values = c(21, 8)) +
+  geom_line(data = newdata_hab, aes(x = SL_0, y = hab_pred, linetype = hshift,
+                                    color = hshift),
+            size = 0.5) +
+  facet_grid( ~ treatment_f, 
+              labeller = labeller(treatment_f = labelss_treat)) +
+  scale_color_manual(values = c("#fa8775", "#9d02d7")) +
+  theme_bw() +
+  labs(linetype = "microhabitat \nshift",
+       color = "microhabitat \nshift",
+       shape = "microhabitat \nshift")
+pgh
+
+jpeg(file.path(here::here(), "vignettes", "figures", "growth_by_habitat_and_treatment.jpeg"),
+     width = 7, height = 4, units = "in", res = 400)
+pgh
+dev.off()
+```
+
+The $\Delta$ AIC between the model with density as a continuous and treatment as a factor is < 4, so we will consider here the more complex model.
+
+As expected, in the control larger individuals that do not change their habitat grow less (- SL: p < 0.001). Individuals that do change their habitat in the control treatment experience an even smaller growth (- hshift: p = 0.031), especially if large (- SL x hshift: p = 0.010). This can be due to the fact that large individuals hold good quality microhabitats at equilibrium conditions. Average sized individuals in the decreased treatment have higher growth than in the control and increased density treatment, if they do not disperse. This again, makes sense given lower density provides weaker competition. Moreover, large individuals in the decreased density treatment benefit from shifting their habitat (SL x treatment x hshift: p = 0.013).
+
+
+
+## Condition
+
+### Condition & Dispersal
+
+An even shorter-term measure of fitness is individual condition. With time, the idea is to evaluate the fat content of the preserved guppies, but for now we can use a proxy for condition in the ratio between weight and SL^3^.
+
+Pregnancy in females complicates the picture, since female might gain weight due to the development of embryos. So condition can only be assessed for males and immature females.
+
+Here I am just plotting weight over length to visualize the relationship and see if there are crazy outliers that need to be checked.
+
+```{r}
+labelss_recap <- c("0" = "capture",
+                   "1" = "recapture")
+
+ggplot(data %>% filter(!is.na(sex_stage), streamID != "TM"),
+       aes(x = as.numeric(SL), y = weight, color = sex_stage)) + 
+  geom_point(alpha = 0.2) + 
+  scale_colour_manual(values = c("#1E88E5", "#FFC107", "#004D40")) +
+  xlab("Standard length (mm)") + ylab("Weight (g)") + 
+  facet_grid(~recap, labeller = labeller(recap = labelss_recap))
+```
+
+All seems fine.
+
+*It is not a concern here, but when looking at the regression size-weight of fish in TM, many males and juvenile males appear to have a very high weight. The reported weight here matches with the physical datasheets, so it's not a typographical error. This can be due to masculinized females, found sometimes in Taylor specifically.*
+
+We can now calculate condition, making sure to remove mature females (whose estimated condition is affected by pregnancy). Since the length is in mm and the weight in grams, the numbers are very small. We will multiply the measures by 10^3^ to turn it into a measure in the unit mg/mm^3^.
+
+As done for growth, we will calculate here difference in condition over 30 days. we will also calculate the relative change in condition over 30 days, as:
+
+$$
+\frac{condition_1 - condition_0}{condition_0} \frac{1}{interval}
+$$
+
+```{r}
+cr_table %<>%
+  mutate(condition_0 = ifelse(sex_stage_0 %in% c("I", "M"), 
+                              weight_0*1000/(SL_0^3),
+                              NA),
+         condition_1 = ifelse(sex_stage_1 %in% c("I", "M"), 
+                              weight_1*1000/(SL_1^3),
+                              NA),
+         cond_diff = condition_1-condition_0,
+         cond_diff_30 = cond_diff*30/as.numeric(interval),
+         rel_cond_change = (condition_1-condition_0)/(condition_0*as.numeric(interval)))
+
+hist(cr_table$cond_diff_30)
+hist(cr_table$rel_cond_change)
+```
+
+We can now test the effect of density on condition. We will adopt a stepwise model simplification by removing non-significant interactions and main effects, as we have done so far.
+
+```{r}
+c0 <- lmer(cond_diff_30 ~ SL_0s * density_factor * moved +
+                   (1|marker_seq) + (1|streamID),
+                 data = cr_table,
+                 na.action = na.omit)
+# I can remove the 3-way interaction
+c1 <- lmer(cond_diff_30 ~ (SL_0s + density_factor + moved)^2 +
+                   (1|marker_seq) + (1|streamID),
+                 data = cr_table,
+                 na.action = na.omit)
+# density x moved can be removed too
+c2 <- lmer(cond_diff_30 ~ SL_0s*density_factor + SL_0s*moved +  
+                   (1|marker_seq) + (1|streamID),
+                 data = cr_table,
+                 na.action = na.omit)
+# density x SL
+c3 <- lmer(cond_diff_30 ~ SL_0s  + SL_0s*moved +  
+                   (1|marker_seq) + (1|streamID),
+                 data = cr_table,
+                 na.action = na.omit)
+# SL x moved
+c4 <- lmer(cond_diff_30 ~ SL_0s + density_factor + moved +  
+                   (1|marker_seq) + (1|streamID),
+                 data = cr_table,
+                 na.action = na.omit)
+# density
+c5 <- lmer(cond_diff_30 ~ SL_0s  + moved +  
+                   (1|marker_seq) + (1|streamID),
+                 data = cr_table,
+                 na.action = na.omit)
+# size
+c6 <- lmer(cond_diff_30 ~  moved +  
+                   (1|marker_seq) + (1|streamID),
+                 data = cr_table,
+                 na.action = na.omit)
+summary(c6)
+```
+```{r, results = "asis"}
+class(c0) = class(c1) = class(c2) = class(c3) = class(c4) = class(c5) = class(c6) <- "lmerMod"
+stargazer::stargazer(c0, c1, c2, c3, c4, c5, c6,
+                     type = "html", report = ('vcp*'),
+                     title  = "Model selection (factorial treatments)",
+                     dep.var.labels = 'Condition (mg/mm^3)',
+                     column.sep.width = "10pt",
+                     omit.stat = c("bic"),
+                     star.char = c('.', '*', '**'))
+```
+
+The best model predicts condition differential to be most negative when individuals disperse. This means that, on average, an individual is more likely decrease in body condition if dispersing. The result makes sense considering how costly dispersal can be. Moreover, large individuals have smaller gains of condition, but not significantly. The trend observed seems to be mostly determined by what happens in the control treatment (very few datapoints all together).
+
+Once again, we can run a model with treatment as a categorical variable to check for asymmetries.
+
+```{r}
+c0b <- lmer(cond_diff_30 ~ SL_0s * treatment * moved +
+                   (1|marker_seq) + (1|streamID),
+                 data = cr_table,
+                 na.action = na.omit)
+# here a bunch of interactions are significant
+summary(c0b)
+AIC(c3, c0b)
+```
+
+The factorial treatment shows different results. The $\Delta$AIC between the two models is quite drastic (> 80), and the model with density as a continuous provides a better fit.
+
+```{r}
+cdp <- ggplot(cr_table, aes(x = moved, 
+                            y = cond_diff_30,
+                            fill = moved)) +
+  geom_boxplot(coef = 0,
+               outliers = FALSE,
+               alpha = 0.75) +
+  xlab("Dispersal") + ylab("Relative change in condition") +
+  ylim(c(-0.01, 0.015)) +
+  geom_jitter(shape=21, position=position_jitter(0.02), alpha = 0.75) +
+  scale_x_discrete(labels = c("NO", "YES")) +
+  scale_fill_manual(values = c("#fa8775", "#9d02d7")) +
+  geom_segment(aes(x = 1, xend = 2, y = 0.013, yend = 0.013), color = "black") +
+  annotate("text", x = 1.5, y = 0.0135, label = "*", size = 6) +
+  theme_bw() +
+  theme(plot.margin = unit(c(0.5,1.5,0.5,1),
+                           "lines"),
+        legend.position = "none")
+
+cdp
+# jpeg(file.path(here::here(), "vignettes", "condition_dispersal.jpeg"),
+#      width = 3, height = 3.5, units = "in", res = 400)
+# cdp
+# dev.off()
+```
+
+Below we plot the results when treatment is considered as a factor (model that was discarded according to AIC values).
+
+```{r}
+newdata_cond <- expand.grid(SL_0 = sls,
+                            treatment = tts,
+                            moved = mv) %>%
+  mutate(SL_0s = (SL_0 - attr(cr_table$SL_0s, "scaled:center"))/
+                    attr(cr_table$SL_0s, "scaled:scale"),
+         moved = factor(moved),
+         treatment_f = factor(treatment, levels = c("D", "C", "I"))) %>%
+  add_column(c_pred = predict(c0b, newdata = ., re.form = ~ 0))
+
+p <- ggplot(cr_table %>% filter(sex_stage_1 %in% c("I", "M")),
+       aes(x = SL_0, y = cond_diff_30)) +
+  xlim(12, 21) +
+  ylab(bquote("Change in condition (" ~ mm/mg^3~")")) + xlab("Initial standard length (mm)") +
+  geom_point(alpha = .5, aes(colour = streamID, shape = moved)) +
+  scale_color_manual(values=c("#DAA323", "#691E92", "#199958")) +
+  scale_shape_manual(values = c(16, 8)) +
+  geom_line(data = newdata_cond, aes(x = SL_0, y = c_pred, linetype = moved), size = 0.5) +
+  facet_grid( ~ treatment_f, 
+              labeller = labeller(treatment_f = labelss_treat)) +
+  ggtitle("Effect of density and dispersal on condition")
+annotate_figure(p, top = text_grob("This  model  was  rejected (Delta AIC >> 4)",
+                                   color = "red", vjust = 7, size = 14))
+```
+
+In order to prove that dispersal decreases condition, and not that individual of lower condition disperse, we will run here a model where *initial* condition is the explanatory variable, and dispersal the response.
+
+```{r}
+# first, I am testing whether initial condition affects dispersal
+c_d <- glmer(moved ~ condition_0 +
+                   (1|marker_0) + (1|streamID),
+             data = cr_table,
+             family = "binomial",
+             na.action = na.omit)
+summary(c_d)
+```
+
+We tried a model with the interaction between `sex_stage` and condition, and the interaction was not significant. We already know males are more likely to disperse than immature individuals, so there is no need to keep sex as a fixed effect.
+
+Initial condition significantly affects dispersal, with individuals in good condition more likely to disperse.
+
+Let's now see if dispersal affects final condition.
+
+```{r}
+d_c <- lmer(condition_1 ~ moved +
+                   (1|marker_0) + (1|streamID),
+                 data = cr_table,
+                 na.action = na.omit)
+summary(d_c)
+```
+
+We tested for an interaction between moved and initial condition, and for the main effect of initial condition, and these were not significant (not even when initial condition is alone in the model). Density also did not have a significant effect on condition. Dispersal has a significant and negative effect on final condition.
+
+```{r}
+conds <- data.frame(condition_0 = modelr::seq_range(cr_table$condition_0, n = 50)) %>%
+  add_column(predicted = plogis(predict(c_d, newdata = ., re.form = ~0)))
+
+c_dplot <- ggplot(
+  cr_table, 
+  aes(x = condition_0, 
+      y = as.numeric(moved))) +
+  geom_point(position = position_jitter(height = 0.03),
+             alpha = 0.75) +
+  geom_line(data = conds, aes(x = condition_0, y = predicted)) +
+  xlab(bquote("Initial condition ("~mm/mg^3~")")) + ylab("Dispersal probability") +
+  theme_bw() +
+  theme(plot.margin = unit(c(0.5,1.5,0.5,1), "lines"))
+
+d_cplot <- ggplot(cr_table, aes(x = moved, y = condition_1)) +
+  geom_boxplot(coef = 0) + 
+  ylim(0.012, 0.026) +
+  ylab(bquote("Final condition ("~mm/mg^3~")")) +
+  xlab("Dispersed") + 
+  geom_segment(aes(x = 1, xend = 2, y = 0.025, yend = 0.025)) +
+  annotate("text", x = 1.5, y = 0.0255, label = "*", size = 6) +
+  theme_bw() +
+  theme(plot.margin = unit(c(0.5,1.5,0.5,1), "lines"))
+
+ggarrange(c_dplot, d_cplot, labels = c("a", "b"))
+
+# Plotting change in condition with dispersal and effect of initial condition on dispersal
+ggarrange(cdp, c_dplot, labels = c("a", "b"))
+jpeg(file.path(here::here(), "vignettes", "figures", "condition_by_dispersal.jpeg"),
+     width = 6, height = 3.5, units = "in", res = 400)
+ggarrange(cdp, c_dplot, labels = c("a", "b"))
+dev.off()
+```
+
+### Condition & Habitat change
+
+For condition too, as we did for growth, we could run a model to observe the short-term effects of habitat change for the individuals who did not disperse.
+
+```{r}
+ch0 <-  lmer(cond_diff_30 ~ density_factor*hshift +
+                   (1|marker_seq) + (1|streamID),
+                 data = cr_table %>% filter(!moved),
+                 na.action = na.omit)
+summary(ch0)
+
+# 3-way is not significant and there's too few datapoints.
+ch0b <- lmer(cond_diff_30 ~ (SL_0s + treatment + hshift)^2 +
+                   (1|marker_seq) + (1|streamID),
+                 data = cr_table %>% filter(!moved),
+                 na.action = na.omit)
+summary(ch0b)
+
+AIC(ch0, ch0b)
+```
+
+The models differ between density as a continuous and as a factor, but the $\Delta$AIC is large enough that we can pick one. The former is a better fit model, so we will consider that.
+
+The only significant term is the interaction between density and habitat shift.
+
+```{r}
+labelss_hab <- c("FALSE" = "SAME HABITAT",
+                   "TRUE" = "CHANGED HABITAT")
+
+chp <- ggplot(cr_table %>% filter(!moved, !is.na(hshift)), 
+       aes(x = density_factor, y = cond_diff_30, colour = treatment)) +
+  geom_hline(yintercept = 0, linetype = "dashed", size = 0.4) +
+  geom_boxplot() +
+  ylab("difference in condition (mm)") + xlab("density multiplier") +
+  geom_jitter(shape=16, position=position_jitter(0.02), alpha = .5) +
+  facet_grid( ~ hshift, labeller = labeller(hshift = labelss_hab)) +
+  ggtitle("Effect of density and habitat change on condition")
+
+chp
+```
+
+These results are intentionally left out of the paper, since the number of analyses is already limiting in reducing the scope of the study to a clear message.
+
+## Pool-level Recruitment
+
+The data for female reproductive allocation published in this study. As a proxy we can look at the recruitment at the pool-level, as the number of newborn (<10 mm) recruited by a given number of adults. This will not give much information on female reproductive output (since the time between capture and recapture will seldom be enough for a female to get pregnant and produce offspring), but rather will give an idea of early-life mortality.
+
+We will calculate the number of adults that were captured in the "control", "decreased" and "increased" pool, and the number of babies in the same pools, to establish the equilibrium "recruitment" as the proportion of babies per adult in the pool. In each pool, the recruitment $R_0 = \frac{r_{captured}}{a_{captured}}$, where $r_{captured}$ and $a_{captured}$ correspond to the number of new recruits (individuals < 10 mm) and adults captured in the pool during the first capture, respectively.
+
+We will then calculate the same recruitment proxy after the experiment ($R_1$) as the ratio between the number of the number of new recruits (< 10 mm) *recaptured* after the experiment ended ($r_{recaptured}$) and the number of adults *released* in the pools as part of the experimental density manipulation ($a_{released}$). This excludes the individuals removed from the decreased pool, and includes the extra-limital individuals added to the increased pool.
+
+Note: while calculating the standard error for the difference in recruitment, we'll have to make a few assumptions, since the sample in this case is a single number. In order to calculate the variance of the difference in recruitment, defined as
+
+$$Var(R_1 - R_0) = Var(\frac{r_{recaptured}}{a_{released}} - \frac{r_{captured}}{a_{captured}})$$
+We will need to assume the covariance between $R_1$ and $R_0$ to be 0, since both are estimated as a single ratio. If we do so, 
+
+$$
+Var(R_1 - R_0) \approx Var(R_1) + Var(R_0)
+$$
+
+In addition, we will use the Delta approximation to calculate variance, as
+
+$$
+Var(R) = Var(\frac{r}{a}) \approx \frac{1}{a^2} Var(r) + \frac{a^2}{r^4}Var(a)
+$$
+A third assumption is that the count data (number of recruits and number of adults) will be Poisson distributed, making
+
+$$
+Var(r) = E(r)\newline
+Var(a) = E(a)
+$$
+
+```{r}
+recruits <- data %>%
+  # only manipulated streams
+  filter(streamID %in% c("CL1", "CL2", "TL")) %>%
+  group_by(streamID, patchID) %>%
+  # we include all individuals captured in a given pool in the accounting of initial recruitment
+  summarise(adults_0 = sum(!isbabyMark & recap == 0 & 
+                             treatment %in% c("C", "D", "I", "R", "XR", "X")),
+            babies_0 = sum(isbabyMark & recap == 0 & 
+                             treatment %in% c("C", "D", "I", "R", "XR", "X")),
+            adults_1 = sum(!isbabyMark & recap == 0 & treatment %in% c("C", "D", "I")),
+            babies_1 = sum(isbabyMark & recap == 1)) %>%
+  filter(!is.na(patchID), adults_0 > 0)
+
+# the increased density pools are missing the added extralimital individuals
+# first, I will assign to each pool its treatment
+patch_to_treat <- data %>%
+  filter(recap == 0, treatment %in% c("I", "C", "D")) %>%
+  group_by(streamID, patchID, treatment) %>%
+  summarise
+
+# I can now add the treatment info to the recruits table
+recruits <- left_join(patch_to_treat, recruits)
+
+# Now, I can count how many adults were added to the increased pool in each stream
+introduced <- data %>%
+  filter(treatment == "E", !isbabyMark) %>%
+  group_by(streamID) %>%
+  summarise(introduced = n())
+
+# now I can merge this, and add the individuals to the introduced pool
+# then I can calculate the proportional recruitment
+# and the error
+recruits %<>%
+  right_join(introduced) %>%
+  mutate(adults_1 = ifelse(treatment == "I", adults_1 + introduced, adults_1)) %>%
+  select(-introduced) %>%
+  mutate(recruit_0 = babies_0/adults_0,
+         recruit_1 = babies_1/adults_1,
+         recruit_0_var = babies_0/(adults_0^2) + babies_0/(adults_0^3),
+         recruit_1_var = babies_1/(adults_1^2) + babies_1/(adults_1^3),
+         SE = sqrt(recruit_1_var + recruit_0_var))
+
+# last step, including the information on density as continuous factor
+# instead of categorical variables
+recruits <- left_join(treatment_tab%>%select(-patchID),recruits) %>%
+  arrange(streamID, density_factor) %>%
+  mutate(treatment = str_replace_all(treatment,
+                                 c("D" = "decreased",
+                                   "C" = "control",
+                                   "I" = "increased")),
+         treatment = factor(treatment, levels = c("decreased", "control", "increased")),
+         stream = plyr::mapvalues(streamID,
+                                        c("CL1", "CL2", "TL"),
+                                        c("Caigual 1", "Caigual 2", "Taylor")),
+         # recentering the density factor
+         density_factor = density_factor - 1)
+  
+```
+
+We can now plot to visualize the proportional recruitment before and after, in the different treatments. Keep in mind that "recruitment" here is simply the ratio between individuals <10 mm and adult individuals.
+
+```{r}
+pr <- ggplot(recruits, 
+             aes(x = density_factor, 
+                 y = recruit_1 - recruit_0, 
+                 group = stream,
+                 color = stream)) +
+  geom_point(aes(shape = stream), 
+             size = 2.5,
+             position = position_dodge(0.02)) +
+  geom_path(aes(linetype = stream)) +
+  ylim(-.5, .6) +
+  geom_errorbar(aes(ymin = recruit_1 - recruit_0 - SE, ymax = recruit_1 - recruit_0 + SE),
+                width = 0.0,
+                position = position_dodge(0.02)) +
+  scale_x_continuous(breaks = c(-0.5, 0., 0.5)) +
+  scale_shape_manual(values = c(16,17,15)) +
+  scale_color_manual(values=c("#DAA323", "#691E92", "#199958")) +
+  labs(y = "Recruitment difference (± SE)", x = "Poportional change in density", 
+       color = "Stream", linetype = "Stream", shape = "Stream") +
+  theme_bw()
+
+pr
+
+jpeg(file.path(here::here(), "vignettes", "figures", "pool_level_recruitment.jpeg"),
+     width = 5, height = 3.5, units = "in", res = 400)
+pr
+dev.off()
+```
+
+An important comment is to be made here: as stated above, the number of babies at the recapture is divided by the number of adults **released** during capture. This is not necessarily equal to the number of adults recaptured, since some individual might have left the habitat patch, dispersing away. This was done to avoid confounding two things: the effects of density in terms of dispersal (more individuals might trigger more dispersal) and the effects of density on recruitment.
+
+We can run here a very simple model to see if the trend is significant (despite having very few datapoints).
+
+```{r}
+summary(r_model0 <- lm(I(recruit_1 - recruit_0) ~ density_factor, data = recruits))
+summary(r_model0b <- lm(I(recruit_1 - recruit_0) ~ treatment, data = recruits))
+
+AIC(r_model0, r_model0b)
+```
+
+Recruitment is significantly lower at higher density, as we would expect. 
+
+
+## Survival
+
+The last trait we can look at is Survival. We can approximate survival calculating recapture rate of individuals released.
+
+```{r}
+# first, we need a fresh and unmodified version of the cr_table
+cr <- readRDS(file.path(here::here(), "vignettes", "DME_cr_data.rds"))
+
+# I also need to revise the treatment table so treatment "E" can be assigned to
+# a density factor value
+treatment_surv <- rbind(treatment_tab,
+                        treatment_tab %>% 
+                          filter(treatment == "I") %>%
+                          mutate(treatment = "E")) %>%
+  ungroup() %>%
+  select(-patchID) %>%
+  rename(pool_density = density_factor)
+  
+
+# subsetting for individuals released after first capture
+# creating variable for recaptured or not
+released <- data %>%
+  filter(recap == 0, treatment %in% c("C", "D", "I", "E"),
+         !isbabyMark, !isCohort) %>%
+  mutate(recaptured = as.numeric(markID %in% unique(cr$markID)),
+         SL_s = scale(as.numeric(SL)),
+         pool_treatment = plyr::mapvalues(treatment,
+                                          c("C", "D", "I", "E"),
+                                          c("control", "decreased", "increased", "increased")),
+         sex_stage = factor(sex_stage, levels = c("F", "I", "M")))
+  
+# adding density as a continuous
+released %<>%
+  left_join(treatment_surv) %>%
+  mutate(pool_density = pool_density - 1)
+```
+
+Now we can analyse survival probability based on density (including size and sex). I can adopt the same procedure as before, running the model twice and using density both as a factor and as a continuous value.
+
+```{r}
+s0 <- glmer(recaptured ~ SL_s*sex_stage*pool_density + (1|streamID),
+           family = "binomial",
+           data = released)
+
+s1 <- glmer(recaptured ~ (SL_s+sex_stage+pool_density)^2 + (1|streamID),
+           family = "binomial",
+           data = released)
+
+s2 <- glmer(recaptured ~ SL_s*sex_stage+sex_stage*pool_density + (1|streamID),
+           family = "binomial",
+           data = released)
+summary(s2)
+# LRT
+anova(s1, s0, test = "Chisq")
+
+
+s0b <-  glmer(recaptured ~ SL_s*sex_stage+sex_stage*pool_treatment + (1|location),
+           family = "binomial",
+           data = released)
+summary(s0b)
+
+AIC(s0, s0b)
+```
+
+Given the difference in AIC value is larger than 4, I will consider the model with density as a continuous value
+
+```{r}
+# plotting
+mean_s <- released %>%
+  group_by(streamID, pool_treatment, pool_density, sex_stage) %>%
+  summarise(survival = mean(recaptured),
+            n = n(),
+            survival_SE = sqrt((survival*(1-survival))/n)) %>%
+  arrange(streamID, pool_density) %>%
+  mutate("stream" = plyr::mapvalues(streamID,
+                                        c("CL1", "CL2", "TL"),
+                                        c("Caigual 1", "Caigual 2", "Taylor")),
+         sex = plyr::mapvalues(sex_stage,
+                               c("F", "I", "M"),
+                               c("females", "immature", "males")),
+         upperCI = survival + survival_SE,
+         lowerCI = survival - survival_SE,
+         upperCI = ifelse(upperCI > 1, 1, upperCI),
+         lowerCI = ifelse(lowerCI < 0 , 0, lowerCI))
+
+p <- ggplot(mean_s, aes(x = pool_density, y = survival, 
+                        group = stream, color = stream)) +
+  geom_point(aes(shape = stream), size = 3,
+                position = position_dodge(0.02)) +
+  geom_path(aes(linetype = stream)) +
+  geom_errorbar(aes(x = pool_density, 
+                    ymin = lowerCI, 
+                    ymax = upperCI),
+                width = 0.0,
+                position = position_dodge(0.02)) +
+  scale_shape_manual(values = c(16,17,15)) +
+  scale_x_continuous(breaks = c(-0.5, 0, 0.5)) +
+  scale_color_manual(values=c("#DAA323", "#691E92", "#199958")) +
+  labs(x = "Proportional change in density", y = "Survival (± SE)",
+       shape = "Stream", color = "Stream", linetype = "Stream") + 
+  ylim(0,1) +
+  facet_grid(~ sex) +
+  theme_bw()
+p
+
+jpeg(file.path(here::here(), "vignettes", "figures", "pool_level_survival.jpeg"),
+     width = 8, height = 5, units = "in", res = 400)
+p
+dev.off()
+```

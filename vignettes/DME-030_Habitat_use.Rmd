@@ -1,0 +1,493 @@
+---
+title: "Habitat use"
+author: "Seba De Bona"
+date: ""
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 4
+    theme: flatly
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview and Setup
+
+Here we will use the benthic area calculated [here](DME-015_Habitat_use.html) to create predictive models to assign an individual to the different habitats (with associated probabilities) based on its size, sex and habitat availability.
+
+We will fit a [Discrete Choice Model](https://en.wikipedia.org/wiki/Discrete_choice) on the capture data alone to calculate parameters defining the probability to choose a habitat type based on size and sex, and weighed by the habitat avilability. The model will be fitted using the package [mlogit](https://cran.r-project.org/web/packages/mlogit/index.html).
+
+Discrete Choice Models are used in econometrics to analyse, describe and predict individual choices  among a finite set of discrete alternatives, based on a series of covariates that can be attributes to the individual or to the alternatives. For example, we can analyse and predict the preferred mean of transport by an individual, based on age and income (individual attributes), between train, bus and car each of which is associated with a certain cost, travel time and comfort (alternative attributes). Moreover, we can include a third category of covariates. The choice can be repeated several times, and each time the season or weather might be different (choice situation attributes) and affect the decision.
+
+We will then use the parameters estimated by the model to calculate the simulated habitat occupancy for each pool during the recapture, based on the individuals that were recaptured, their size and sex. Comparing this simulated occupancy with the real occupancy we will detect an effect of density manipulation on habitat use.
+
+```{r, messages = F}
+# loading required packages
+library(tidyverse)
+library(magrittr)
+library(nnet)
+library(mlogit)
+library(ggpubr)
+
+# this package requires the package guppyDme to be installed. If the user wishes not to install the package, please comment out the "library(guppyDme)" line and run instead the lines commented out below
+
+#### If you have the guppyDme package installed
+# loading package
+library(guppyDme)
+
+# # If you do NOT wish to install the guppyDme package, please uncomment and run the following two lines of code, adding the package functions to the Global Environment and loading the data
+# source(file.path(here::here(), "R", "package_functions.R"))
+# load(file.path(here::here(), "data", "DMEdata.rda"))
+
+# loading data
+data <- DMEdata
+pool_comp <- readRDS(file.path(here::here(), "vignettes", "DME_pool_composition.rds"))
+treatment_tab <- readRDS(file.path(here::here(), "vignettes", "DME_density_factor_in_treatments.rds"))
+
+# I am creating an additional column in the dataset, redefining sex_stage classes
+data %<>%
+  mutate(sex_stage = score_sexst(., f_threshold = 14, f_unit = "SL"))
+```
+
+## Data management
+
+To determine the structure of the data to be analysed I am using the approach detailed in this [vignette](https://cran.r-project.org/web/packages/mlogit/vignettes/c2.formula.data.html).
+
+Before proceeding, DCMs allow to fit three separate kind of covariate, defined by the scale at which they vary:
+
+* individual-specific covariates (I)
+* alternative-specific covariates (A) or
+* choice situation specific covariates (C).
+
+In our case we will include size (I), sex (I) and the benthic area associated with each habitat (A).
+There are also other variables we could be including, and might, in the future:
+
+* I: condition
+* A: mean and variance of water velocity, mean and variance of depth, most represented substrate
+* C: density, size structure, total benthic area, n. of alternatives
+
+For now we'll just stick to the simplest model, and fitted to the capture data only. Here using **relative** benthic area measures for the different habitats.
+
+```{r}
+# adding pool composition information to the data
+data <- pool_comp %>%
+  mutate(recap = ifelse(cap_recap == "cap", 0, 1)) %>%
+  select(recap, streamID, patchID,
+         A = relA, B = relB, C = relC, D = relD, E = relE, tot_ba = tot) %>%
+  left_join(data, .)
+
+# trimming only the needed data
+# We are here only including first capture, excluding Taylor mouth, and those datapoints where
+# habitat is not defined
+# We are also adding a unique ID column, to cope with repeated cohort marks later
+hab_sel <- data %>%
+  filter(recap == 0, streamID != "TM", !is.na(habitat)) %>%
+  select(markID, SL, sex_stage, habitat,
+         A, B, C, D, E) %>%
+  add_column(id = 1:nrow(.))
+head(hab_sel)
+```
+
+We need to transform the data so that it would fit the long format described [here](https://cran.r-project.org/web/packages/mlogit/vignettes/c2.formula.data.html). This allows the choice set to vary between choice events (meaning it will allow us to remove from a set of alternatives habitats that are not present in a given pool).
+
+```{r}
+# reshaping it as a long format
+hab_sel %<>%
+  gather(A, B, C, D, E, key = "alt", value = "ba") %>%
+  # just to better visualise it...
+  arrange(id) %>%
+  # creating the choice column
+  mutate(choice = as.numeric(habitat == alt)) %>%
+  select(id, markID, alt, choice, SL, sex_stage, ba) %>%
+  filter(ba > 0)
+
+head(hab_sel)
+
+# We need to make sure that every individuals has a decision assigned.
+# If an individual was found in a habitat that is scored as having benthic area (ba) = 0,
+# such instance would be a mistake, and should be fixed.
+N_ROWS <- hab_sel %>%
+  group_by(id, markID) %>%
+  summarise(didPick = sum(choice)==1) %>%
+  filter(!didPick) %>%
+  nrow()
+
+stopifnot(N_ROWS == 0)
+# all looks good!
+```
+
+
+## Building the predictive model
+
+To build the model, I am using as guidelines two separate vignettes: [vignette 1](https://cran.r-project.org/web/packages/mlogit/vignettes/c2.formula.data.html) | [vignette 2](https://cran.r-project.org/web/packages/mlogit/vignettes/c3.rum.html).
+
+One of the individual covariates we want to include is size. At the moment, most individuals below 10 mm are assigned a character string `"<10"`. This can be dealt with in two ways. Either having them all a numeric value assigned, that can be a random value drawn from a uniform distribution between 8 and 10 mm (or a fixed value) or them being removed from the analyses (and analysed separately), having only large sized individuals.
+
+We will try here both approaches and see how different the results are.
+
+### Joint sizes
+
+Here, we will assign a set value (9 mm) to each fish whose size is below 10 mm.
+
+```{r}
+# here I define the set value
+set_val <- 9
+
+# all individuals below 10 mm (either measured or with a label "<10")
+# will be assigned the set value
+dj <- hab_sel %>%
+  mutate(SL = replace(SL, SL == "<10", set_val),
+         SL = as.numeric(SL),
+         SL = replace(SL, SL < 10, set_val))
+```
+
+We can use the function `mlogit.data()` to transform the data in the appropriate format.
+
+```{r}
+mld_dj <- mlogit.data(as.data.frame(dj), 
+                      shape = "long", 
+                      alt.var = "alt", 
+                      chid.var = "id")
+```
+
+
+The model does not work with `tibble`s, since it requires rownames. From now on we need to work with `data.frame`s instead of `tibble`s.
+
+We can now run the model, making sure to use the right formula. 
+
+```{r}
+DCM_j <- mlogit(choice ~ ba | SL * sex_stage, mld_dj, reflevel = "A")
+summary(DCM_j)
+```
+
+The interpretation of the sign of the estimate for choice-specific variables (here `SL` and `sex_stage`) is non-intuitive, since it refers to the estimate compared to the other levels. What can be interpreted is the estimated coefficient of alternative-specific variables (`ba`)
+
+The interesting effect seem to be between habitats. They are occupied with significantly different probabilities by females, and there are no significant differences between females and the other two classes (trend safe for the occupancy of the C habitat by immature individuals).
+Size also seems to have a significant effect on habitat occupancy. Benthic area has also a significant positive effect (which can be interpreted, given it's alternative specific).
+
+It's good to keep in mind what the reference level and the Intercept are.
+The intercept refers to females (`F`) of size 0. The reference level for the dependent variable is habitat `A`. So all odd-ratios in the intercept refer to the odd ratio between the probability to be in a given habitat and the probability to be in A.
+
+The function `fitted()` makes it extremely easy to calculate the predicted probabilities, for each row in the data, to be in each of the habitats, given the model parameters.
+
+```{r}
+pp <- fitted(DCM_j, "probabilities")
+head(pp)
+```
+
+It's encouraging to see that the predicted probability to occupy "E", when this is not available, is zero.
+
+Generating a mock dataset it's possible to display the average probabilities to occupy different habitats based on size and sex. The mock dataset should be similar to the real data in its format.
+
+
+```{r}
+head(mld_dj)
+```
+
+First, we are creating the changing variables.
+
+```{r}
+# vector of lengths
+sls <- seq(range(mld_dj$SL, na.rm = T)[1], range(mld_dj$SL, na.rm = T)[2], length.out = 50)
+# vector of sex_stages
+sxs <- unique(mld_dj$sex_stage, na.rm = T)
+
+# then using expand.grid I can create all combinations. 
+# Each of them is a hypothetical individual, so it whould receive an id
+block <- cbind(expand.grid(SL = sls, sex_stage = sxs), 
+               id = 1:(length(sls)*length(sxs)))
+```
+
+Now each individual should be repeated as many times as the available habitats, and each of the habitats should be assigned an alternative-specific variable, if there are. In our case, we do have the relative benthic area. Here, to make the interpretation of the figures easier, we will assume all habitats are present with equal proportions (0.20).
+
+```{r}
+habs <- data.frame(alt = unique(as.character(mld_dj$alt), 
+                                na.rm = T),
+                   ba = .2)
+
+# now I can "expand grid" again (this time using merge, since I am combining dataframes)
+mock_d <- merge(habs, block, by = NULL)
+
+# habitat alternatives should be turned into factors
+mock_d$alt <- as.factor(mock_d$alt)
+```
+
+Now we have what we need to predict...
+
+```{r}
+# generating predictions and storing them side by side with the block
+# (which unlike mock_d does not have repeated individuals once per habitat)
+pred_mock <- cbind(block,
+                   predict(DCM_j, newdata = mock_d, type = "probs")
+                   )
+           
+
+# I don't want to show prediction for irrational values (e.g. very
+# large immature individuals, which are not present, or very small mature ones)
+# I'll limit the plotting to reasonable values
+# here I'll find the ranges for female, males and immature individuals
+low_m <- min(as.numeric(data %>% filter(sex_stage == "M") %>% pull(SL)), na.rm = T)
+low_f <- min(as.numeric(data %>% filter(sex_stage == "F") %>% pull(SL)), na.rm = T)
+hi_m <- max(as.numeric(data %>% filter(sex_stage == "M") %>% pull(SL)), na.rm = T)
+hi_i <- max(as.numeric(data %>% filter(sex_stage == "I") %>% pull(SL)), na.rm = T)
+
+pred_mock %<>%
+  filter(sex_stage == "I" & SL < hi_i |
+           sex_stage == "F" & SL > low_f |
+           sex_stage == "M" & SL > low_m & SL < hi_m)
+     
+
+# reshaping dataset to long(er) format, and releveling sex_stage
+pred_mock %<>%
+  gather(A, B, C, D, E, key = habitat, value = probability) %>%
+  mutate(sex_stage = factor(sex_stage, levels = c("I", "M", "F")))
+```
+
+...and we can plot. When plotting, we'll make sure to trim the predictions to the measured values of size in the `sex_stages`, so we won't infer non-realistic probabilities.
+
+```{r}
+# plotting
+ggplot(pred_mock, aes(x = SL, y = probability, colour = sex_stage)) +
+  geom_line() +
+  ylim(0,1) +
+  scale_color_manual(values = c("#1E88E5", "#FFC107", "#004D40")) +
+  facet_grid(habitat ~ ., scales = "free", labeller = labeller(habitat = hablab())) +
+  ggtitle("Joint size model - predictions")
+```
+
+
+### Split sizes
+
+We will now repeat the same analyses, but using a split size approach. Here we will run a model for individuals larger than 10 mm, and a model (size-independent) for individuals below that threshold value.
+
+```{r}
+# for now I will only take individuals with a numeric size
+# creating a dataset for adults (> 10mm, with size information)
+ds_ads <- hab_sel %>%
+  mutate(SL = as.numeric(SL)) %>%
+  filter(SL > 10)
+# and a dataset for babies, <10mm, and without precise SL measurements
+ds_bbs <- hab_sel %>%
+  filter(SL == "<10" | as.numeric(SL)<10)
+```
+
+We are working here with two datasets. First, the adults regressions.
+
+```{r}
+# converting dataset into mlogit format
+mld_ads <- mlogit.data(as.data.frame(ds_ads), 
+                       shape = "long",
+                       alt.var = "alt",
+                       chid.var = "id")
+
+# running model
+DCM_ads <- mlogit(choice ~ ba | SL * sex_stage, mld_ads, reflevel = "A")
+
+# visualizing results
+summary(DCM_ads)
+```
+
+The results for adults only are very similar to those obtained for all individuals in the "Joint size" model.
+
+We can now repeat the same analyses, with the individuals **< 10 mm**.
+
+```{r}
+mld_bbs <- mlogit.data(as.data.frame(ds_bbs),
+                       shape = "long", 
+                       alt.var = "alt", 
+                       chid.var = "id")
+
+# running model
+DCM_bbs <-  mlogit(choice ~ ba | 1, mld_bbs, reflevel = "A")
+# visualizing results
+summary(DCM_bbs)
+```
+
+Below is a combined plot for the split sizes.
+
+```{r}
+# predictions for adults
+sls_ads <- seq(range(mld_ads$SL, na.rm = T)[1], range(mld_ads$SL, na.rm = T)[2], length.out = 50)
+sxs_ads <- unique(mld_ads$sex_stage, na.rm = T)
+block_ads <- cbind(expand.grid(SL = sls_ads, sex_stage = sxs_ads), 
+               id = 1:(length(sls_ads)*length(sxs_ads)))
+habs_ads <- data.frame(alt = unique(as.character(mld_ads$alt), na.rm = T),
+              ba = .2)
+mock_ads <- merge(habs_ads, block, by = NULL)
+
+# predictions for adults
+pred_mock_s <- cbind(block_ads,
+                   predict(DCM_ads, newdata = mock_ads, type = "probs")
+                   )
+
+# as done for the joint model, triming sex_stage to actual size range
+pred_mock_s %<>%
+  filter(sex_stage == "I" & SL < hi_i |
+           sex_stage == "F" & SL > low_f |
+           sex_stage == "M" & SL > low_m & SL < hi_m)
+
+# reshaping dataset
+pred_mock_s %<>%
+  gather(A, B, C, D, E, key = habitat, value = probability)
+
+
+# creating a separate predictions for babies and combining the two datasets
+pred_mock_s <- merge(data.frame(probability = predict(DCM_bbs,
+                                                      newdata = habs,
+                                                      type = "probs"),
+                                habitat = names(predict(DCM_bbs,
+                                                      newdata = habs,
+                                                      type = "probs"))),
+                      data.frame(SL = c(8, 10), sex_stage = rep("< 10mm", 2))) %>%
+  bind_rows(pred_mock_s)
+
+# reordering factors for sex_stage
+pred_mock_s %<>%
+  mutate(sex_stage = factor(sex_stage, levels = c("< 10mm", "I", "M", "F")))
+
+# plotting
+ggplot(pred_mock_s, aes(x = SL, y = probability, colour = sex_stage)) +
+  geom_line() +
+  ylim(0,1) +
+  scale_color_manual(values = c("black", "#1E88E5", "#FFC107", "#004D40")) +
+  facet_grid(habitat ~ ., scales = "free", labeller = labeller(habitat = hablab())) +
+  ggtitle("Split-size Model")
+```
+
+
+## Simulations of Occupancy
+
+Now that we have generated models from the capture data we can use them, together with the census data from the recapture, to generate predicted occupancy. If density has not affected habitat use, the predicted occupancy should match the observed one. If it has, the only matching observation would be for the control pool, whereas the observed occupancy in increased and decreased pool will not match the predicted one.
+
+To generate the simulations, for simplicity, we will only use the joint model since it quite closely matches the split one.
+
+First, we extract the data for the recapture.
+
+The `predict` function in mlogit turns out to be rather clunky and confusing. We are trying here to follow the direction of user "Manos C" from [this thread](https://stats.stackexchange.com/questions/6702/predict-after-running-the-mlogit-function-in-r/60778) to make it work. If not, we will then adopt the trick suggested by user "Robert Bray".
+
+
+```{r}
+# I will here add information on the pool treatment,
+# filter out the capture event info and transform SL "<10"
+# values into the set_value
+recap_data <- treatment_tab %>%
+  mutate(pool_treatment = str_replace_all(treatment,
+                                          c("I" = "increased",
+                                            "C" = "control",
+                                            "D" = "decreased"))) %>%
+  select(streamID, patchID, pool_treatment) %>%
+  ungroup() %>%
+  right_join(data %>% filter(recap == 1,
+                             !is.na(habitat))) %>%
+  mutate(SL = replace(SL, SL == "<10", set_val),
+         SL = as.numeric(SL),
+         SL = replace(SL, SL < 10, set_val)) %>%
+  filter(!is.na(pool_treatment), !is.na(sex_stage))
+# filtering out the NAs for sex_stage is extremely important.
+# see https://stats.stackexchange.com/questions/6702/predict-after-running-the-mlogit-function-in-r
+
+# now I can select the columns I need for the predictions
+# I am keeping the habitat to generate a fake choice column later
+to_predict <- recap_data %>%
+  select(streamID, patchID, markID, SL, sex_stage, habitat, pool_treatment,
+         A, B, C, D, E) %>%
+  add_column(id = 1:nrow(.))
+
+# extracting only individual info (dropping habitat area)
+block_predict <- to_predict %>%
+  select(streamID, patchID, markID, SL, sex_stage, habitat, pool_treatment)
+
+# and finally reshape is as a long format
+# also, releveling the factors to match those above and creating mock choice
+ml_topred <- to_predict %>%
+  gather(A, B, C, D, E, key = "alt", value = "ba") %>%
+  arrange(id) %>%
+  mutate(alt = factor(alt, levels = levels(mock_d$alt)),
+         sex_stage = factor(sex_stage, levels = levels(mock_d$sex_stage)),
+         choice = ifelse(habitat == alt, 1, 0)) %>%
+  select(alt, ba, SL, sex_stage, choice, id) %>%
+  filter(ba > 0) %>%
+  mutate(chid = id)
+# the step of filtering out the choices where ba = 0 (non-existing
+# alternatives) is crucial since it allows to predict a probability
+# equal to zero to choose that habitat!
+
+# I need to run the function `mlogit.data` (according to Manos C),
+# as if this data needed to be anlysed
+ml_topred <- mlogit.data(as.data.frame(ml_topred), shape = "long", 
+                      alt.var = "alt", chid.var = "id")
+```
+
+We can now extract the predicted probabilities for each individual to be in one of the habitats in a given pool, based on their size, sex and the habitat availability during recapture.
+
+```{r}
+# before storing the model anywhere, I am making some quick tests
+# whether the predict works out well.
+# The number of predictions should be equal to the number of individuals
+stopifnot(nrow(block_predict) == nrow(predict(DCM_j, newdata = ml_topred, type = "probs")))
+
+# also, the predict should be unaffected by the arbitrary choice I introduced
+x <- predict(DCM_j, newdata = ml_topred, type = "probs")[1,]
+ml_topred2 <- ml_topred
+ml_topred2[1:3, "choice"] <- c(1, 0, 0)
+y <- predict(DCM_j, newdata = ml_topred2, type = "probs")[1,]
+
+stopifnot(sum(x-y) == 0)
+# all good, we can store the predictions
+
+recap_preds <- cbind(block_predict, 
+                     predict(DCM_j, newdata = ml_topred, type = "probs"))
+```
+
+
+### Comparing simulations to observed occupancy
+
+Now that we generated the predicted probabilities of each individual to be in a given habitat given its size, sex and habitat availability, we can generate simulations of occupancy for each pool and compare the reference value with the real observed occupancy.
+
+Before running any simulation, we can plot the observed occupancy with the sum of probabilities for individuals to be in each habitat (summing individual probability distributions among habitats).
+
+```{r}
+# gathering predicted distributions
+pred_distr <- recap_preds %>%
+  group_by(streamID, pool_treatment) %>%
+  summarize(A = sum(A),
+            B = sum(B),
+            C = sum(C),
+            D = sum(D),
+            E = sum(E)) %>%
+gather(A, B, C, D, E, key = habitat, value = predicted)
+
+# now observed distributions
+obs_distr <- recap_preds %>%
+  group_by(streamID, pool_treatment) %>%
+  summarize(A = sum(habitat == "A"),
+            B = sum(habitat == "B"),
+            C = sum(habitat == "C"),
+            D = sum(habitat == "D"),
+            E = sum(habitat == "E")) %>%
+gather(A, B, C, D, E, key = habitat, value = observed)
+
+# now joining the two
+pred_v_obs <- inner_join(pred_distr, obs_distr) %>%
+  filter(observed > 0)
+
+# and plotting
+ggplot(pred_v_obs, aes(x = habitat, col = habitat)) +
+  geom_point(aes(y = predicted), shape = 5) +
+  geom_point(aes(y = observed)) +
+  facet_grid(streamID ~ pool_treatment) +
+  scale_color_manual(values = c(
+  "#ffd700",
+  "#fa8775",
+  "#cd34b5",
+  "#9d02d7",
+  "#0000ff")) +
+  theme_bw()
+  
+
+```
+
+The filled circles here represent the observed occupancy, while the empty diamonds represent predicted occupancy.

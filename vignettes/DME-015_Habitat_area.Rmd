@@ -1,0 +1,341 @@
+---
+title: "Habitat area"
+author: "Seba De Bona"
+date: ""
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 4
+    theme: flatly
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview & setup
+
+Here we will calculate the relative area of each habitat, in each pool. This will allow us to account for habitat availability when analyzing habitat use.
+
+```{r}
+# loading packages
+library(tidyverse)
+library(magrittr)
+
+# this vignette requires the package guppyDme to be installed. If the user wishes not to install the package, please comment out the "library(guppyDme)" line and run instead the lines commented out below
+
+#### If you have the guppyDme package installed
+# loading package
+library(guppyDme)
+
+# # If you do NOT wish to install the guppyDme package, please uncomment and run the following two lines of code, adding the package functions to the Global Environment and loading the data
+# source(file.path(here::here(), "R", "package_functions.R"))
+# load(file.path(here::here(), "data", "DMEhabitat.rda"))
+
+habitat <- DMEhabitat
+str(habitat)
+# for future checks
+NROWS <- nrow(habitat)
+
+# as for the cap-recap data, we will consider
+# backwaters as habitat D, given the shared properties.
+habitat %>%
+  filter(habitat == "BW")
+
+# this only occurs for 2 pools: an actual backwater in TL,
+# and a backwater in P33-38.5, which sits between CL1 and CL2
+habitat %<>%
+  mutate(habitat = ifelse(habitat == "BW", "D", habitat))
+```
+
+### Visualising the streams
+
+The area has to be calculated separately for each stream/capture event/pool combination. Using `tidyr` we can group the dataset and apply the calculations to each of the unique combinations.
+To make sure the data for the area we generate here is compatible with that of the capture-recapture dataset, we will use the shared `patchID` variable (generated with the file *reach_key.csv*), rather than reach.
+
+```{r}
+# using a nested dataset approach
+by_pool <- habitat %>%
+  select(-reach) %>%
+  group_by(cap_recap, streamID, patchID) %>%
+  nest()
+
+head(by_pool$data[[1]])
+```
+
+To get a better idea of the data, we want to find a way to visualise the distribution on the tiles in the stream. We are here plotting, side to side, the capture and recapture of a stream.
+
+```{r}
+# plotting Taylor LP capture and recapture
+# by mistake, the x values for capture are inverted, so we will transform them here
+tp <- by_pool %>%
+  filter(streamID == "TL") %>%
+  select(data, cap_recap) %>%
+  unnest(data) %>%
+  mutate(x = ifelse(cap_recap == "cap", -x, x))
+
+# We will replace the letter legend with word-explanations of the  habitats
+hab_names <- sort(unique(tp$habitat))%>%
+  str_replace_all(hablab()) %>%
+  str_replace("beachW", "BW") %>%
+  c("NA")
+
+ggplot(tp, aes(x = y, y = -x, color = habitat)) + 
+  geom_point(size = 3, shape = 15) +
+  ylim(-500, 500) +
+  geom_point(aes(shape=factor(submerged)), size = 1, color="black") +
+  scale_shape_manual(values = c(19, 1)) +
+  scale_color_discrete(labels = hab_names) +
+  facet_grid(cap_recap ~ ., scales = "free")
+```
+
+Between instances the habitat measurments, at least in the case of Taylor Low Predation, were conducetd differently. The recapture only has measurements for the main pools, and avoids riffle areas (for time constraints).
+
+```{r}
+# now plotting Caigual, 1 then 2
+c1p <- by_pool %>%
+  filter(streamID == "CL1") %>%
+  select(data, cap_recap) %>%
+  unnest(data)
+# replacing letter legend with word-explanations
+hab_names_c1p <- sort(unique(c1p$habitat))%>%
+  str_replace_all(hablab()) %>%
+  str_replace("beachW", "BW") %>%
+  c("NA")
+
+c2p <- by_pool %>%
+  filter(streamID == "CL2") %>%
+  select(data, cap_recap) %>%
+  unnest(data)
+# replacing letter legend with word-explanations
+hab_names_c2p <- sort(unique(c2p$habitat))%>%
+  str_replace_all(hablab()) %>%
+  str_replace("beachW", "BW") %>%
+  c("NA")
+
+ggplot(c1p, aes(x = y, y = -x, color = habitat)) + 
+  geom_point(size = 3, shape = 15) +
+  ylim(-500, 500) +
+  geom_point(aes(shape=factor(submerged)), size = 1, color="black") +
+  scale_shape_manual(values = c(19, 1)) +
+  scale_color_discrete(labels = hab_names_c1p) +
+  facet_grid(cap_recap ~ ., scales = "free")
+
+ggplot(c2p, aes(x = y, y = -x, color = habitat)) + 
+  geom_point(size = 3, shape = 15) +
+  ylim(-500, 500) +
+  geom_point(aes(shape=factor(submerged)), size = 1, color="black") +
+  scale_shape_manual(values = c(19, 1)) +
+  scale_color_discrete(labels = hab_names_c2p) +
+  facet_grid(cap_recap ~ ., scales = "free")
+```
+Similar issues in Caigual.
+
+
+### Calculating habitat areas
+
+The easiest way to calculate relative bethic area of the different habitats in a pool would be to count the size of the grid (50cm^2^ or 1m^2^) each time an habitat is recorded in a pool. For shared habitats (e.g. 'b/c') the tile size can be divided by how many habitats share it, and that fraction be allocated to all of the habitats involved.
+
+In some streams though the measures on both the x and y axis happen at uneven intervals, seldom exactly 50cm or 1m long. A better alternative then would be, for each point in the grid, to calculate the distance to the point to it's right, left, upstream and downstream, divide them all by two, add the distances on the two axes (right/2 + left/2 and upstream/2 + downstream/2) and calculate the area of the rectangle having those sides.
+
+We will try with this last approach. We can use the functions `lead()` and `lag()` to obtain points to the right and left of each grid point. Using group_by() and nest() we can subset the data into chunks that share the same y value
+
+```{r}
+by_y <- habitat %>%
+  group_by(cap_recap, streamID, patchID, y) %>%
+  nest()
+```
+
+A combination of `map()` and `mutate()` lets us calculate the semi-distance between each grid point and the point to its right and left.
+For the points at the edge of each stream transect, we will assume the habitat extends towards the edge for an amount that corresponds to the smallest semi-distance. We are using this measures because it reflects the smallest half-increment considered in the measures of that section. 
+
+```{r}
+by_y %<>%
+  # first, arranging each tibble by increasing values of x
+  mutate(data = map(data, ~.x %>%
+                      arrange(x))) %>%
+  # then calculating semi-distances along the x axis
+  mutate(data = map(data, ~ .x %>%
+                      mutate(d.r = abs(x - lag(x))/2,
+                             d.l = abs(x - lead(x))/2,
+                             # and adding semi-distances to edges
+                             d.r = ifelse(length(d.r)>1 & is.na(d.r), min(d.r, na.rm = T), d.r),
+                             d.l = ifelse(length(d.l)>1 & is.na(d.l), min(d.l, na.rm = T), d.l)
+                    )))
+```
+
+One operation left to do is to assign semi-distances to grid points that were the only one in a transect. This means they have no neighboring points to calculate a semi-distance from.
+
+```{r}
+by_reach <- by_y %>%
+  # unnesting and regrouping by reach only
+  unnest(cols = c(data)) %>%
+  group_by(cap_recap, streamID, patchID) %>%
+  nest()
+
+# adding median value to "lonely" grid points
+habitat <- by_reach %>% mutate(data = map(data, ~ .x %>%
+                      mutate(d.r = replace(d.r, is.na(d.r), median(d.r, na.rm = T)),
+                             d.l = replace(d.r, is.na(d.r), median(d.r, na.rm = T))
+                    ))) %>%
+  unnest(cols = c(data))
+
+# checking the number of row matches after unnesting
+stopifnot(nrow(habitat)==NROWS)
+```
+
+
+We've now obtained the values for the semi-distance to left and right; we should do the same for up- and downstream.
+
+In the up- and downstream distance, since the up and downstream boundaries are strict ones, the semi-distance before the upstream-most point and below the downstream-most point will be 0.
+
+```{r}
+whys <- by_y %>%
+  # trimming away the nested tibbles
+  select(cap_recap, streamID, patchID, y) %>%
+  # re-grouping and desting
+  group_by(cap_recap, streamID, patchID) %>% 
+  nest() %>%
+  # sorting by values of y
+  mutate(data = map(data, ~.x %>%
+                      arrange(y))) %>%
+  # calculating semi-distances on the y axis
+  mutate(data = map(data, ~.x %>%
+                      mutate(d.d = ifelse(is.na(lag(y)), 0, abs(lag(y)-y)/2),
+                             d.u = ifelse(is.na(lead(y)), 0, abs(lead(y)-y)/2)
+                             ))) %>%
+  unnest(cols = c(data))
+```
+
+All is left to do is merging the d.d and d.u values into the habitat dataframe.
+
+```{r}
+habitat <- left_join(habitat, whys, by = c("cap_recap", "streamID", "patchID", "y"))
+# check
+stopifnot(nrow(habitat)==NROWS)
+```
+
+We can now calculate the benthic area of each "tile"" around a grid point.
+To begin we are checking if there are absurd values for the distances.
+
+```{r}
+par(mfrow = c(2,2))
+hist(habitat$d.r, main = "right", xlab = "cm")
+hist(habitat$d.l, main = "left", xlab = "cm")
+hist(habitat$d.u, main = "upstream", xlab = "m")
+hist(habitat$d.d, main = "downstream", xlab = "m")
+
+habitat[which(habitat$d.d==0 & habitat$d.u==0),]
+```
+
+In two instances the reach is very short (~1m) and defined by only one transect. For this reason both d.u and d.d are set to 0. We will set both to 50 cm here, so that they represent the 1m reach.
+
+```{r}
+habitat[which(habitat$d.d==0 & habitat$d.u==0), c("d.d", "d.u")] <- .5
+```
+
+
+We can now move onto calculating the areas. We need to transform the measures to the same scale. So we'll divide `d.r` and `d.l` so they are in meters.
+
+```{r}
+habitat %<>%
+  mutate(d.l = d.l/100,
+         d.r = d.r/100,
+         ba = (d.l + d.r)*(d.u + d.d))
+```
+
+The final step is to calculate the relative area of each habitat in each pool.
+To set up an easy way to deal with shared gridpoints (e.g. a/b/e), we will create a variable that counts by how many habitats a gridpoint is shared.
+
+```{r}
+# creating a variable that defines how many habitats share a grid point
+habitat %<>%
+  mutate(parts = str_count(habitat, "/") + 1)
+```
+
+I can now use again a nested dataset approach to calculate the relative and total area of the different habitats.
+
+```{r}
+# creating a custom function to pick out habitats and sum bentic area 
+add_habitat <- function(data, pattern){
+  if(pattern == "all"){
+    data %>% 
+      pull(ba) %>%
+      sum(na.rm = T)
+  } else {
+    data %>%
+    filter(str_detect(habitat, pattern)) %>%
+    mutate(ba_parted = ba/parts) %>%
+    pull(ba_parted) %>%
+    sum(na.rm = T)
+  }
+}
+
+# applying the function to all habitats of interest. In the process removing
+# no habitats (banks and emerged)
+by_pool <- habitat %>%
+  filter(!is.na(habitat)) %>%
+  group_by(cap_recap, streamID, patchID) %>%
+  nest() %>%
+  mutate(A = map(data, add_habitat, "A"),
+         B = map(data, add_habitat, "B"),
+         C = map(data, add_habitat, "C"),
+         D = map(data, add_habitat, "D"),
+         E = map(data, add_habitat, "E"),
+         tot = map(data, add_habitat, "all"))
+
+# unnesting
+pool_comp <- by_pool %>%
+  select(-data) %>%
+  unnest(cols = c(A, B, C, D, E, tot))
+
+# calculating relative areas
+pool_comp %<>%
+  mutate(relA = A/tot,
+         relB = B/tot,
+         relC = C/tot,
+         relD = D/tot,
+         relE = E/tot)
+```
+
+To visualize the composition of each pool we can plot the relative area.
+
+```{r}
+# finding which pools are present before and after
+shared_pools <- intersect(pool_comp %>% filter(cap_recap == "cap") %>% pull(patchID), 
+                          pool_comp %>% filter(cap_recap == "recap") %>% pull(patchID))
+
+# first, reshaping the dataframe
+toplot <- pool_comp %>%
+  filter(streamID != "TM", str_sub(patchID, 1, 1)=="P") %>%
+  select(-c(A, B, C, D, E, tot)) %>%
+  rename(A=relA, B=relB, C=relC, D=relD, E=relE)  %>%
+  gather(A, B, C, D, E, key = habitat, value = ba)
+
+# # Displaying all pools (no riffles)
+# ggplot(toplot, aes(x = patchID, y = ba, fill = habitat)) + 
+#   geom_bar(stat = "identity") +
+#   facet_grid(cap_recap ~., scales = "free") +
+#   scale_fill_discrete(labels = hablab()) +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+#   ggtitle("All pools")
+
+# We can now display only the shared pools between capture and recapture
+ggplot(toplot %>% filter(patchID %in% shared_pools),
+       aes(x = patchID, y = ba, fill = habitat)) + 
+  geom_bar(stat = "identity") +
+  facet_grid(cap_recap ~., scales = "free") +
+  scale_fill_discrete(labels = hablab()) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ggtitle("Shared pools only")
+```
+
+There are a few pools with a chunk of the percentage missing. That's due to the presence of either a boundary in common with a riffle or to some weird habitat (such as F in `P59.68.5`) that yield no guppies.
+
+
+### Saving output
+
+```{r}
+saveRDS(pool_comp, file = file.path(here::here(), "vignettes", "DME_pool_composition.rds"))
+```

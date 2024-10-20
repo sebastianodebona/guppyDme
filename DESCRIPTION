@@ -1,0 +1,43 @@
+Package: guppyDme
+Title: Density manipulation experiment with wild guppy populations
+Version: 1.0.0
+Authors@R: c(person("Seba", "De Bona", email = "sebastiano.debona@gmail.com",
+            role = c("aut", "cre"), comment = c(ORCID = "0000-0001-6193-7073")),
+            person("Matthieu", "Bruneaux", role = c("aut"),  email = "matthieu.bruneaux@gmail.com"),
+            person("Andrés", "López-Sepulcre", role = c("aut"), email = "lopezsepulcre@gmail.com")
+            )
+Description: This package containes the analyses to study the effects of a density manipulation experiment on dispersal, habitat quality and diet, using wild guppy populations in Trinidadian streams.
+License: MIT License
+URL: https://gitlab.com/sebadebona/density-manipulation-experiment
+BugReports: https://gitlab.com/sebadebona/density-manipulation-experiment/issues
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    car,
+    devtools,
+    FactoMineR,
+    factoextra,
+    ggplot2,
+    ggpubr,
+    here,
+    knitr,
+    lme4,
+    lmerTest,
+    lubridate,
+    magrittr,
+    mlogit,
+    pkgdown,
+    plyr,
+    rmarkdown,
+    roxygen2,
+    rtf,
+    scales,
+    stargazer,
+    tidyverse
+Suggestions:
+    ape,
+    dendextend,
+    gridGraphics,
+    igraph,
+    viridis
+RoxygenNote: 7.3.2

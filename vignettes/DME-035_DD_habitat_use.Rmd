@@ -1,0 +1,314 @@
+---
+title: "Density-dependent habitat use"
+author: "Seba De Bona"
+date: ""
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 4
+    theme: flatly
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview and Setup
+
+In this vignette, we build up on the [previous vignette](DME-030_Habitat_use.html), adopting again a Discrete-Choice model approach but including density as an independent variable and analyzing in one go the capture and recapture data.
+
+In the previous vignette I was trying to generate estimates based on the capture model, to then predict expected habitat occupancy during the recapture and compare it with the observed occupancy. No clear, visible trend is visible using that approach, therefore, having a somwhat more complicated d-c model that includes density in the first place might shade some light on that.
+
+When analysing capture and recapture at the same time, we create a mismatch between individuals and choice situation. Now `id` and `chid` have to be defined separately, and what I will do is to assign `chid` a value corresponding to 1 for capture and 2 for recapture. What's important, is to account correctly for individuals that are analysed twice: if an individual is recaptured, it's id should be the same. The density experienced is a choice situation specific covariate: the density factor associated with the capture will always be 1 (since all pools were assumed to be at equilibrium before being manipulated).
+
+In the analyses here I will adopt the joint model, considering how close the results with the split model were (and the joint is easier).
+
+## Required packages and Data 
+
+```{r, messages = F}
+# loading required packages
+library(tidyverse)
+library(magrittr)
+library(nnet)
+library(mlogit)
+library(ggpubr)
+library(rtf)
+
+# this package requires the package guppyDme to be installed. If the user wishes not to install the package, please comment out the "library(guppyDme)" line and run instead the lines commented out below
+
+#### If you have the guppyDme package installed
+# loading package
+library(guppyDme)
+
+# # If you do NOT wish to install the guppyDme package, please uncomment and run the following two lines of code, adding the package functions to the Global Environment and loading the data
+# source(file.path(here::here(), "R", "package_functions.R"))
+# load(file.path(here::here(), "data", "DMEdata.rda"))
+
+# loading data
+data <- DMEdata
+pool_comp <- readRDS(file.path(here::here(), "vignettes", "DME_pool_composition.rds"))
+treatment_tab <- readRDS(file.path(here::here(), "vignettes", "DME_density_factor_in_treatments.rds"))
+
+# I am creating an additional column in the dataset, redefining sex_stage classes
+# I am also transforming SL into numeric, substituting the "<10", and 
+# every numeric value below 10mm, with a numeric `set_value`.
+set_value <- 9
+data %<>%
+  mutate(SL = replace(SL, SL == "<10", set_value),
+         SL = as.numeric(SL),
+         SL = replace(SL, SL < 10, set_value),
+         sex_stage = score_sexst(., f_threshold = 14, f_unit = "SL"),
+         sex_stage = factor(sex_stage, levels = c("F", "I", "M")))
+```
+
+## Data handling
+
+We am using, once again, this [vignette](https://cran.r-project.org/web/packages/mlogit/vignettes/c2.formula.data.html) to guide the decision on data handling and model construction.
+
+Below, we include pool composition info (relative benthic area for each habitat present) and density information (which is 1 for every pool at capture, and corresponds to the modified density during the recap).
+
+```{r}
+# adding pool composition info
+data <- pool_comp %>%
+  mutate(recap = ifelse(cap_recap == "cap", 0, 1)) %>%
+  select(recap, streamID, patchID,
+         A = relA, B = relB, C = relC, D = relD, E = relE, tot_ba = tot) %>%
+  left_join(data, .)
+
+# adding density info
+data <- treatment_tab %>%
+  add_column(recap = 1) %>%
+  select(-treatment) %>%
+  rename(pool_density = density_factor) %>%
+  left_join(data,.) %>%
+  mutate(pool_density = ifelse(recap == 0, 1, pool_density))
+```
+
+The dataset now contains a lot of information that we don't need, so we can trim it down. We need to include a variable for individual `id` and a variable for `chid`. When doing this, we need to be careful with the id assigned to cohort marks. If we were to simply use the `markID` variable to generate id, all cohort marks will be considered as repeated measures of the same individual.
+
+```{r}
+# trimming only the needed data
+# - excluding Taylor mouth
+# - excluding undefined habitat
+hdata <- data %>%
+  filter(streamID != "TM", !is.na(habitat)) %>%
+  select(markID, SL, sex_stage, habitat, pool_density, recap, isbabyMark, isCohort,
+         A, B, C, D, E)
+
+# here I will extract all individuals who have more than 1
+# record per cap/recap
+not_unique_ids <- as.data.frame(table(hdata$markID, hdata$recap)) %>%
+  filter(Freq > 1) %>%
+  pull(Var1) %>%
+  as.character()
+
+# to assign unique ids, first I generate a column of actually unique ids
+# that are above the maximum number of unique markIDs
+# then, I can draw unique values from this column for individuals
+# that don't already have a unique id
+hdata %<>%
+  mutate(bench_id = (max(as.numeric(markID)) + 1):(max(as.numeric(markID)) + nrow(.)),
+         id = ifelse(!(markID %in% not_unique_ids), as.numeric(markID), bench_id)) %>%
+  arrange(id) %>%
+  mutate(chid = 1:nrow(.)) %>%
+  select(-bench_id)
+```
+
+Now we are transforming the data into the long format, to allow for the set of alternative to vary amonge choices (see [here](https://cran.r-project.org/web/packages/mlogit/vignettes/c2.formula.data.html) ).
+
+```{r}
+# reshaping it as a long format
+hdata %<>%
+  gather(A, B, C, D, E, key = "alt", value = "ba") %>%
+  mutate(choice = as.numeric(habitat == alt)) %>%
+  arrange(chid) %>%
+  select(id, chid, markID, alt, choice, SL, sex_stage, ba, pool_density, recap) %>%
+  filter(ba > 0)
+head(hdata)
+
+# re-centering pool_density, creating factorial treatment
+hdata %<>%
+  mutate(pool_density = pool_density - 1,
+         treatment = ifelse(pool_density == 0, "control",
+                            ifelse(pool_density > 0, "increased", "decreased")))
+
+# I need to make sure that every individuals has a decision assigned.
+# In the case an individual was found in a habitat at ba 0, this would not be the case
+# of course, such instance would be a mistake, and should be fixed.
+n_rows <- hdata %>%
+  group_by(id, markID, chid) %>%
+  summarise(didPick = sum(choice)==1) %>%
+  filter(!didPick) %>%
+  nrow()
+
+# check to see if any fish did not decide
+stopifnot(n_rows == 0)
+# all good
+```
+
+We can now transform the data in the appropriate format with the function `mlogit.data()`, and we are ready for the analysis.
+
+```{r}
+data_mlogit <- mlogit.data(as.data.frame(hdata), shape = "long", 
+                      alt.var = "alt", id.var = "id", chid.var = "chid")
+```
+
+
+## Analysis
+
+We need to be careful about how we specify the formula. One of `package:mlogit`'s own [vignettes](https://cran.r-project.org/web/packages/mlogit/vignettes/c2.formula.data.html) has a pretty clear guide.
+
+The formula is split in three parts separated by the symbol `|`., in the form
+
+```{r, eval = F}
+formula = response ~ part I | part II | part III
+```
+
+The three parts represent 3 different tipe of variables:
+
+* part I correponds to alternative-specific covariates with generic coefficient (the value of which is consistent across alternatives, e.g. money is always the same)
+* part II correponds to choice-situation-specific covariates, that change among choices but apply to all alternatives in that choice
+* part III correponds to alternative-specific covariates with alternative-specific coefficients (i.e. if time spent in a transport mattered differently: 10 minutes in public transport are fine, but 10 minutes walking are less preferable)
+
+In our analyses, all we have are part I (benthic area `ba`) and part II (standard length `SL`, sex `sex_stage` and density `pool_density`). We might try to introduce also whether the choice was made in the capture or the recapture (`recap`), which would also fall into part II.
+
+Let's try and run the model.
+
+
+NOTE: in contrast with what done before, we are here not running a model with treatment as a factor because the model will not converge. The number of interactions is likely a little too big.
+
+```{r}
+dcmodel <- mlogit(choice ~ ba | SL * sex_stage * pool_density, data_mlogit, reflevel = "A")
+summary(dcmodel)
+```
+
+We will export the output as a doc table.
+
+```{r}
+names(summary(dcmodel))
+ptable <- round(as.data.frame(summary(dcmodel)$CoefTable), 3) %>%
+  add_column(coeff = rownames(as.data.frame(summary(dcmodel)$CoefTable)), .before = 1)
+
+
+rtffile <- RTF(file.path(here::here(), "vignettes", "DCM_output.doc"))  # this can be an .rtf or a .doc
+addTable(rtffile, ptable)
+done(rtffile)
+```
+
+The interpretation of the results is somewhat tricky, so we will plot the estimated probabilities as done in the previous vignette, but this time also including the density values.
+
+```{r}
+sls <- modelr::seq_range(hdata$SL, n= 50)
+sxs <- levels(hdata$sex_stage)
+ds <- c(-.5, 0, .5)
+
+# then using expand grid I can create all combinations. 
+# Each of them is an hypothetical individual, so whould receive an id
+block <- cbind(expand.grid(SL = sls, sex_stage = sxs, pool_density = ds)) %>%
+  add_column(id = 1:nrow(.))
+
+# I can now expand this block to include all possible alternatives
+# here, I am weighing them all the same
+habs <- data.frame(alt = unique(hdata$alt),
+                   ba = .2)
+mock_d <- merge(habs, block, by = NULL)
+```
+
+We are now ready to generate predictions and plot them.
+
+```{r}
+# generating predictions and storing them side by side with the block
+# (which unlike mock_d does not have repeated individuals once per habitat)
+pred_mock <- cbind(block,
+                   predict(dcmodel, newdata = mock_d, type = "probs")
+                   )
+
+# reshaping dataset to long(er) format, and releveling sex_stage
+pred_mock %<>%
+  gather(A, B, C, D, E, key = habitat, value = probability) %>%
+  mutate(sex_stage = factor(sex_stage, levels = c("I", "M", "F")))
+
+#### TRIMMING
+##### COPY-PASTING this NOW, REPLACE WITH NEW in_range FUNCTION!
+low_m <- min(as.numeric(data %>% filter(sex_stage == "M") %>% pull(SL)), na.rm = T)
+low_f <- min(as.numeric(data %>% filter(sex_stage == "F") %>% pull(SL)), na.rm = T)
+hi_m <- max(as.numeric(data %>% filter(sex_stage == "M") %>% pull(SL)), na.rm = T)
+hi_i <- max(as.numeric(data %>% filter(sex_stage == "I") %>% pull(SL)), na.rm = T)
+
+pred_mock %<>%
+  filter(sex_stage == "I" & SL < hi_i |
+           sex_stage == "F" & SL > low_f |
+           sex_stage == "M" & SL > low_m & SL < hi_m) %>%
+  mutate(treatment = plyr::mapvalues(pool_density,
+                                     c(-0.5, 0, 0.5),
+                                     c("decreased", "control", "increased")),
+         treatment = factor(treatment, levels = c("decreased", "control", "increased")),
+         sex = plyr::mapvalues(sex_stage,
+                               c("I", "M", "F"),
+                               c("immature", "males", "females")))
+     
+
+# plotting
+hcp <- ggplot(pred_mock, aes(x = SL, y = probability, colour = sex)) +
+  geom_line() +
+  ylim(0,1) + xlab("standard length (mm)") +
+  scale_color_manual(values = c("#1E88E5", "#FFC107", "#004D40")) +
+  facet_grid(habitat ~ treatment, scales = "free", labeller = labeller(habitat = hablab())) +
+  theme_bw()
+
+hcp
+
+jpeg(file.path(here::here(), "vignettes", "figures", "habitat_choice.jpeg"),
+     width = 8, height = 6, units = "in", res = 400)
+hcp
+dev.off()
+```
+
+A few quick thoughts on what's going on here:
+
+* The inflow (habitat "A") is thought to be a good quality habitat for drift feeding. Drift feeding requires large enough mouths, so we expect large individuals to benefit from it. We can observe that while in the control and increased density large females dominate this habitat, in the decrease treatment this habitat becomes accessible to relatively large males and immatures as well.
+
+* Large females are seen to abandon the core and swamp area they occupy at low density to move predominantly in the inflow at high density. This again can be due to a shift in diet, making use of the harder to get and probably easier to monopolise drift feeding options, instead of using highly demanded resources in "everyone's land" (the core).
+
+* Small juveniles tend to occupy more central habitats (core and beach at it associated) at low density, but seem to be relegated  to marginal areas (swamp) when density is high. Swamps at high density seem a pretty secure habitat, with few large individuals and often marginal.
+
+
+### Ignoring sex?
+
+Both these results and the [previous](DME-030_Habitat_use.html) show a remarkable consistency among different sexes, whilst most of the variation seem nudged in the size. We will here run a very similar model to that above, but ignoring sex_stage.
+
+```{r}
+dcmodel_sexless <- mlogit(choice ~ ba | SL * pool_density, data_mlogit, reflevel = "A")
+summary(dcmodel_sexless)
+
+AIC(dcmodel_sexless, dcmodel)
+```
+
+The model including sex has a much better fit, but we'll plot to visualize the results anyways.
+
+```{r}
+# removing sex-stage variable
+mock_sexless <- mock_d %>%
+  filter(sex_stage == "I") %>%
+  select(-sex_stage)
+
+# generating predictions
+pred_mock_sexless <- cbind(block %>% filter(sex_stage == "I") %>% select(-sex_stage),
+                           predict(dcmodel_sexless, newdata = mock_sexless, type = "probs"))  
+
+# reshaping
+pred_mock_sexless %<>%
+  gather(A, B, C, D, E, key = habitat, value = probability) %>%
+  mutate(density = plyr::mapvalues(pool_density,
+                                   c(-0.5, 0, 0.5),
+                                   c("decreased", "control", "increased")),
+         density = factor(density, levels = c("decreased", "control", "increased")))
+
+# plotting
+ggplot(pred_mock_sexless, aes(x = SL, y = probability)) +
+  geom_line(aes(linetype = density)) +
+  scale_linetype_manual(values=c("solid", "dashed", "dotted")) +
+  facet_grid(habitat ~., scales = "free", labeller = labeller(habitat = hablab())) +
+  ggtitle("Predictions of habitat use")
+```

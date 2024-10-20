@@ -1,0 +1,496 @@
+---
+title: "Dispersal and Habitat shift"
+author: "Seba De Bona"
+date: ""
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 4
+    theme: flatly
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview & Setup
+
+Here we will analyse the effects of density on dispersal. Our hypothesis is that higher density will force more individuals to disperse, given the stronger competition over resources.
+
+This vignette relies on previous vignettes (000, 010, 015) having run, since it builds upon the capture-recapture dataset we generated.
+
+```{r, message = F, warning=F}
+library(tidyverse)
+library(ggpubr)
+library(lme4)
+library(stargazer)
+library(magrittr)
+
+# this vignette requires the package guppyDme to be installed. If the user wishes not to install the package, please comment out the "library(guppyDme)" line and run instead the lines commented out below
+
+#### If you have the guppyDme package installed
+# loading package
+library(guppyDme)
+
+# # If you do NOT wish to install the guppyDme package, please uncomment and run the following two lines of code, adding the package functions to the Global Environment and loading the data
+# source(file.path(here::here(), "R", "package_functions.R"))
+
+# here we load the capture-recapture dataset.
+cr_data <- readRDS(file.path(here::here(), "vignettes", "DME_cr_data.rds"))
+```
+
+## Dispersal
+
+Let's have a look at the fluxes of dispersal between different treatments.
+
+```{r}
+# here all individuals
+mat <- cr_data %>%
+  filter(moved) %>%
+  select(pool_treat_1, pool_treat_0) %>%
+  table() %T>%
+  print %>%
+  as.data.frame()
+
+ggplot(mat, aes(x = pool_treat_0, y = pool_treat_1, fill = Freq)) +
+  geom_tile() + 
+  scale_fill_distiller(palette = "YlOrRd", direction = 2) +
+  ylab("destination") + xlab("origin") +
+  geom_text(aes(label=Freq), size = 8) + 
+  ggtitle("All individuals")
+```
+
+This graphic representation includes individuals from the extra-limital reaches introduced into the increased-density pool. Let's have a look at "resident" individuals only. Also, We'll be pooling together "control" and "natural" areas since density should be at the equilibrium in both.
+
+```{r}
+mat1 <- cr_data %>%
+  filter(moved, treatment %in% c("C", "I", "D")) %>%
+  mutate(pool_treat_1 = ifelse(pool_treat_1=="natural", "control", pool_treat_1)) %>%
+  select(pool_treat_1, pool_treat_0) %>%
+  table() %>%
+  as.data.frame()
+ggplot(mat1, aes(x = pool_treat_0, y = pool_treat_1, fill = Freq)) +
+  geom_tile() + 
+  scale_fill_distiller(palette = "YlOrRd", direction = 2) +
+  ylab("destination") + xlab("origin") +
+  geom_text(aes(label=Freq), size = 8) +
+  ggtitle("Extralimital excluded")
+```
+
+To test for the effect of density on dispersal we'll run GLMM with binomial error distribution. We will include interval (time) as an `offset`, which in binomial models needs not be in the log scale (see: [here](https://stats.stackexchange.com/questions/25415/using-offset-in-binomial-model-to-account-for-increased-numbers-of-patients) ). The model with a non-logged `offset` throws an error, so we will have interval as a covariate for now.
+
+First, we will run the model including density as a **continuous** factor, together with initial standard length and sex-stage.
+
+```{r}
+# it might be best to rescale the variables to improve model convergence
+# I am also only selecting resident individuals (excluding extralimital
+# in increased density pools)
+cr_data %<>%
+  filter(treatment %in% c("C", "D", "I")) %>%
+  mutate(SL_0s = scale(SL_0),
+         interval = scale(as.numeric(interval)),
+         density_factor = density_factor - 1)
+
+d0 <- glmer(moved ~ SL_0s*sex_stage_0*density_factor + (1|streamID),
+            family = "binomial",
+            offset = interval,
+            control = glmerControl(optimizer = "bobyqa", 
+                                   optCtrl = list(maxfun = 100000)),
+            na.action = na.omit,
+            data = cr_data)
+# remove the three way (not significant at the .10 level)
+d1 <- glmer(moved ~ (SL_0s+sex_stage_0+density_factor)^2 + (1|streamID),
+            family = "binomial",
+            offset = interval,
+            control = glmerControl(optimizer = "bobyqa", 
+                                   optCtrl = list(maxfun = 100000)),
+            na.action = na.omit,
+            data = cr_data)
+# remove size x density
+d2 <- glmer(moved ~ SL_0s*sex_stage_0+sex_stage_0*density_factor + (1|streamID),
+            family = "binomial",
+            offset = interval,
+            control = glmerControl(optimizer = "bobyqa", 
+                                   optCtrl = list(maxfun = 100000)),
+            na.action = na.omit,
+            data = cr_data)
+# remove sex x density
+d3 <- glmer(moved ~ SL_0s*sex_stage_0+density_factor + (1|streamID),
+            family = "binomial",
+            offset = interval,
+            control = glmerControl(optimizer = "bobyqa", 
+                                   optCtrl = list(maxfun = 100000)),
+            na.action = na.omit,
+            data = cr_data)
+# remove density
+d4 <- glmer(moved ~ SL_0s*sex_stage_0 + (1|streamID),
+            family = "binomial",
+            offset = interval,
+            control = glmerControl(optimizer = "bobyqa", 
+                                   optCtrl = list(maxfun = 100000)),
+            na.action = na.omit,
+            data = cr_data)
+```
+```{r, results = "asis", warning = FALSE}
+stargazer::stargazer(d0, d1, d2, d3, d4,
+                     type = "html", report = ('vcp*'),
+                     title  = "Model selection (continous density)",
+                     dep.var.labels = 'Probability to disperse',
+                     column.sep.width = "10pt",
+                     omit.stat = c("bic"),
+                     star.char = c('.', '*', '**'))
+```
+
+Since there might be some asymmetry in the way density affects dispersal, we will also try to fit a model with treatment as a **categorical** variable, and the same structure of covariates.
+
+```{r}
+d1b <- glmer(moved ~ SL_0s*sex_stage_0*treatment + (1|streamID),
+            family = "binomial",
+            offset = interval,
+            na.action = na.omit,
+            data = cr_data)
+# the model throws some convergence warnings
+d2b <- glmer(moved ~ (SL_0s+sex_stage_0+treatment)^2 + (1|streamID),
+            family = "binomial",
+            offset = interval,
+            na.action = na.omit,
+            data = cr_data)
+d3b <- glmer(moved ~ SL_0s*sex_stage_0+SL_0s*treatment  + (1|streamID),
+            family = "binomial",
+            offset = interval,
+            na.action = na.omit,
+            data = cr_data)
+d4b <- glmer(moved ~ SL_0s*sex_stage_0+treatment  + (1|streamID),
+            family = "binomial",
+            offset = interval,
+            na.action = na.omit,
+            data = cr_data)
+d5b <- glmer(moved ~ SL_0s*sex_stage_0 + (1|streamID),
+            family = "binomial",
+            offset = interval,
+            na.action = na.omit,
+            data = cr_data)
+```
+```{r, results = "asis"}
+# displaying model comparison (the first two models don't converge and are not reported)
+stargazer::stargazer(d3b, d4b, d5b,
+                     type = "html", report = ('vcp*'),
+                     title  = "Model selection (factorial density)",
+                     dep.var.labels = 'Probability to disperse',
+                     column.sep.width = "10pt",
+                     omit.stat = c("bic"),
+                     star.char = c('.', '*', '**'))
+```
+
+The two resulting models, from our model simplification approach, are the same whether treatment (density) is included as a continuous or categorical variable, so there is no need to compare AIC values.
+
+```{r}
+summary(d4)
+```
+
+
+```{r}
+# quick plot to have a visual idea
+mean_dispersal <- cr_data %>%
+  group_by(streamID, treatment, density_factor) %>%
+  summarize(p_mov = mean(moved, na.rm = T),
+            st_dev = sd(moved, na.rm = T),
+            n = n()) %>% 
+  mutate(se = st_dev/sqrt(n))
+  
+# then against the continuous density
+ggplot(mean_dispersal, aes(x = density_factor, y = p_mov, col = streamID)) + 
+  geom_point(size = 4, position = position_dodge(0.1)) +
+  geom_errorbar(aes(ymin=p_mov - se*2, ymax=p_mov + se*2),
+                position = position_dodge(0.1), width=0) + 
+  ylim(0, 1) + 
+  labs(x = "density multiplier", y = "Dispersal probability", color = "Stream") +
+  scale_color_manual(values=c("#DAA323", "#691E92", "#199958")) +
+  ggtitle("Dispersal probability as a function of density") +
+  theme_bw()
+```
+
+We can dive a little deeper into how dispersal probability changes based on size and sex and density. The plot below shows the predicted dispersal probability as a function of standard length (in mm), marginalized over the random effect `stream_ID`, for females, males, and immature individuals separately. The predictions are bound to the appropriate parameter space, spanning from the minimum and maximum recorded size for each of the three sex-stage categories.
+
+```{r}
+# generating newdata to predict probability to disperse
+sls <- modelr::seq_range(cr_data$SL_0, n = 50)
+sxs <- unique(cr_data$sex_stage_0)
+
+newdata <- expand.grid(SL_0 = sls,
+                       sex_stage_0 = sxs)
+newdata_disp <- newdata %>%
+  mutate(SL_0s = (SL_0 - attr(cr_data$SL_0s, "scaled:center"))/
+           attr(cr_data$SL_0s, "scaled:scale")) %>%
+  add_column(pred_mov = plogis(predict(d4, newdata = ., re.form = ~0))) %>%
+  mutate(sex_stage = factor(sex_stage_0, levels = c("I", "M", "F"))) %>%
+  filter((sex_stage == "M" & 
+           in_range(SL_0, cr_data %>% filter(sex_stage_0 == "M") %>% pull (SL_0))) |
+           (sex_stage == "I" & 
+           in_range(SL_0, cr_data %>% filter(sex_stage_0 == "I") %>% pull (SL_0))) |
+           (sex_stage == "F" & 
+              in_range(SL_0, cr_data %>% filter(sex_stage_0 == "F") %>% pull (SL_0)))) %>%
+  mutate(sex = plyr::mapvalues(sex_stage,
+                               c("I", "M", "F"),
+                               c("immature", "males", "females")))
+  
+# creating new variable to uniform color
+cr_data %<>%
+  mutate(sex_lett =plyr::mapvalues(sex_stage_0,
+                                   c("I", "M", "F"),
+                                   c("immature", "males", "females")))
+
+# extracting model matrix from selected model and newdata
+# sourced here(https://stackoverflow.com/questions/53255211/plotting-random-effects-for-a-binomial-glmer-in-ggplot)
+Xmat <- model.matrix(~SL_0s * sex_stage_0, newdata_disp)
+# extracting fixed effect vector
+fixest <- fixef(d4)
+# calculating predicted values
+fit <- as.vector(fixest %*% t(Xmat))
+# calculating the standard error each estimates
+SE <- sqrt(diag(Xmat %*% vcov(d4) %*% t(Xmat)))
+# binomial link function
+linkinv <- binomial()$linkinv
+
+# adding CI to newdata
+newdata_disp %<>% 
+  add_column(fitted = linkinv(fit),
+             lower = linkinv(fit - SE),
+             upper = linkinv(fit + SE))
+  
+
+pd <- ggplot(newdata_disp, aes(x = SL_0, y = fitted, colour = sex)) +
+  geom_line() + 
+  geom_ribbon(aes(ymin = lower, ymax = upper, fill = sex), 
+              color = "transparent", alpha = 0.5) +
+  geom_point(data = cr_data, aes(x = SL_0, y = as.numeric(moved), 
+                 colour = factor(sex_lett, levels = c("immature", "males", "females"))), alpha = 0.5,
+             position = position_jitter(w = 0, h = 0.05)) +
+  scale_colour_manual(values = c("#1E88E5", "#FFC107", "#004D40")) +
+  scale_fill_manual(values = c("#1E88E5", "#FFC107", "#004D40")) +
+  xlab("Standard length (mm)") +
+  ylab("Dispersal probability") +
+  theme_bw()
+
+pd
+
+# saving figure
+dir.create(file.path(here::here(), "vignettes", "figures"))
+jpeg(file.path(here::here(), "vignettes", "figures", "dispersal_p_by_sex.jpeg"),
+     width = 7, height = 5, units = "in", res = 400)
+pd
+dev.off()
+```
+
+## Habitat shift
+
+Again, let's first visualize what type of habitat change we observe in the three different pools, among individuals that stayed and left the pool.
+
+```{r}
+mat <- cr_data %>%
+  filter(treatment %in% c("C", "D", "I")) %>%
+  select(habitat_0, habitat_1, treatment, moved) %>%
+  table() %T>%
+  print %>%
+  as.data.frame()
+
+pool_lables = c("C" = "control",
+                "D" = "decreased",
+                "I" = "increased")
+moved_labels = c("FALSE" = "STAYED",
+                 "TRUE" = "DISPERSED")
+
+ggplot(mat, aes(x = habitat_0, y = habitat_1, fill = Freq)) +
+  geom_tile() + 
+  scale_fill_distiller(palette = "YlOrRd", direction = 2) +
+  ylab("destination") + xlab("origin") +
+  geom_text(aes(label=Freq), size = 8) +
+  facet_grid(moved ~ treatment, labeller = labeller(treatment = pool_lables, moved = moved_labels))
+```
+
+A lot of individuals that stayed in the same pool (did not disperse) have moved to the core of the pool.
+
+We will repeat the same analyses as we did before for dispersal, but now for habitat shift. In addition, we are including a quadratic term since we expect both an increase and a decrease in density could result in habitat change (for either worse or better habitats, respectively).
+
+We'll analyse individuals that did not disperse, as individuals who did disperse have changed pool as well as microhabitat, and the choice to shift microhabitat might therefore be confounded.
+
+Given the very small sample size, it's impossible here to analyse the full model that includes treatment as a factor (the model is rank deficient). To account for asymmetries in the response to density we will instead include a quadratic term.
+
+```{r}
+# Here, individuals who stayed are filtered
+h1 <- glmer(hshift ~ SL_0s*sex_stage_0*density_factor + I(density_factor^2) + (1|streamID),
+            offset = interval,
+            data = cr_data %>% filter(!moved),
+            control = glmerControl(optimizer = c("bobyqa"), 
+                                   optCtrl = list(maxfun = 100000)),
+            family  = "binomial")
+# 3-way removed
+h2 <- glmer(hshift ~ (SL_0s+sex_stage_0+density_factor)^2 + I(density_factor^2) + (1|streamID),
+            offset = interval,
+            data = cr_data %>% filter(!moved),
+            control = glmerControl(optimizer = c("bobyqa"), 
+                                   optCtrl = list(maxfun = 100000)),
+            family  = "binomial")
+# sex x density removed 
+h3 <- glmer(hshift ~ SL_0s*sex_stage_0 + SL_0s*density_factor + I(density_factor^2) + (1|streamID),
+            offset = interval,
+            data = cr_data %>% filter(!moved),
+            control = glmerControl(optimizer = c("bobyqa"), 
+                                   optCtrl = list(maxfun = 100000)),
+            family  = "binomial")
+# size x sex removed
+h4 <- glmer(hshift ~  SL_0s + sex_stage_0 + SL_0s*density_factor + I(density_factor^2) + (1|streamID),
+            offset = interval,
+            data = cr_data %>% filter(!moved),
+            control = glmerControl(optimizer = c("bobyqa")),
+            family  = "binomial")
+# quadratic density term removed
+h5 <- glmer(hshift ~  SL_0s + sex_stage_0 + SL_0s*density_factor + (1|streamID),
+            offset = interval,
+            data = cr_data %>% filter(!moved),
+            control = glmerControl(optimizer = c("bobyqa")),
+            family  = "binomial")
+# sex removed
+h6 <- glmer(hshift ~  SL_0s*density_factor + (1|streamID),
+            offset = interval,
+            data = cr_data %>% filter(!moved),
+            control = glmerControl(optimizer = c("bobyqa")),
+            family  = "binomial")
+# simplified model
+summary(h6)
+```
+```{r, results = "asis"}
+# displaying model comparison
+stargazer::stargazer(h1, h2, h3, h4, h5, h6,
+                     type = "html", report = ('vcp*'),
+                     title  = "Model selection",
+                     dep.var.labels = '',
+                     column.sep.width = "1pt",
+                     font.size = "tiny",
+                     omit.stat = c("bic"),
+                     star.char = c('.', '*', '**'))
+```
+
+The probability to change habitat increases at high density for average sized individuals, but the opposite is true for large individuals.
+
+This can be explained with large individuals monopolizing resources that are either inaccessible to smaller individuals (e.g. drift feeding), or by holding them preferentially even when density is high (context-competition like dynamic).
+
+Below, we visualize the results with a plot.
+
+```{r}
+# defining some representative points for density manipulation (50%, 100%, 150%)
+ds <- c(-0.5, 0, 0.5)
+
+# calculating predictions from selected model
+newdata_hab <- expand.grid(SL_0 = sls,
+                          density_factor = ds) %>%
+  mutate(SL_0s = (SL_0 - attr(cr_data$SL_0s, "scaled:center"))/
+           attr(cr_data$SL_0s, "scaled:scale")) %>%
+  #add_column(pred_mov = plogis(predict(h6, newdata = ., re.form = ~0))) %>%
+  mutate(treatment = plyr::mapvalues(density_factor,
+                                         c(-0.5, 0 , 0.5),
+                                         c("decreased", "control", "increased")),
+         treatment = factor(treatment, levels = c("decreased", "control", "increased")))
+
+# extracting model matrix from selected model and newdata
+# sourced here(https://stackoverflow.com/questions/53255211/plotting-random-effects-for-a-binomial-glmer-in-ggplot)
+Xmat <- model.matrix(~SL_0s * density_factor, newdata_hab)
+# extracting fixed effect vector
+fixest <- fixef(h6)
+# calculating predicted values
+fit <- as.vector(fixest %*% t(Xmat))
+# calculating the standard error each estimates
+SE <- sqrt(diag(Xmat %*% vcov(h6) %*% t(Xmat)))
+# binomial link function
+linkinv <- binomial()$linkinv
+
+# adding CI to newdata
+newdata_hab %<>% 
+  add_column(fitted = linkinv(fit),
+             lower = linkinv(fit - SE),
+             upper = linkinv(fit + SE))
+  
+# creating column on cr_data to match newdata
+alt_data <- cr_data %>%
+  mutate(treatment = plyr::mapvalues(treatment,
+                                          c("C", "D", "I"),
+                                          c("control", "decreased", "increased")),
+         # CAREFUL! The order here is very important and needs to match the order of treatment_lett above
+         treatment = factor(treatment, levels(newdata_hab$treatment)))
+
+
+ph <- ggplot(newdata_hab, aes(x = SL_0, 
+                              y = fitted, 
+                              group = treatment)) +
+  geom_line(aes(colour = treatment),
+            linewidth = 0.75) +
+  geom_ribbon(aes(ymin=lower, ymax=upper, fill=treatment), color=NA, alpha=0.3) +
+  ylim(0, 1) +
+  geom_point(data = alt_data, aes(x = SL_0, 
+                                  y = as.numeric(hshift), 
+                                  fill = treatment, 
+                                  shape = treatment),
+             colour = "black", 
+             alpha = 0.75,
+             position = position_jitter(w = 0, h = 0.08)) +
+  scale_fill_manual(values = c("#ffb14e", "#cd34b5", "#0000ff")) +
+  scale_color_manual(values = c("#ffb14e", "#cd34b5", "#0000ff")) +
+  scale_shape_manual(values = c(25, 22, 24)) +
+  xlab("Standard length (mm)") + ylab("Predicted microhabitat change (p)") +
+  theme_bw()
+ph
+
+# saving plot
+jpeg(file.path(here::here(), "vignettes", "figures", "microhabitat_shift_by_treatment.jpeg"),
+     width = 7, height = 5, units = "in", res = 400)
+ph
+dev.off()
+```
+
+
+Given it was impossible to fit the full model with treatment as a factorial variable (model was rank deficient), we will briefly refit the selected model with treatment as a factor instead of a continuous variable, and compare the results.
+
+```{r}
+# refitting model with categorical variable
+h6b <- glmer(hshift ~  SL_0s*treatment + (1|streamID),
+            offset = interval,
+            data = cr_data %>% filter(!moved),
+            control = glmerControl(optimizer = c("bobyqa")),
+            family  = "binomial")
+summary(h6b)
+AIC(h6, h6b)
+
+# plotting
+tts <- c("C", "D", "I")
+
+newdata_habb <- expand.grid(SL_0 = sls,
+                          treatment = tts) %>%
+  mutate(SL_0s = (SL_0 - attr(cr_data$SL_0s, "scaled:center"))/
+           attr(cr_data$SL_0s, "scaled:scale")) %>%
+  add_column(pred_mov = plogis(predict(h6b, newdata = ., re.form = ~0))) %>% 
+  mutate(treatment = plyr::mapvalues(treatment,
+                                         c("D", "C", "I"),
+                                         c("decreased", "control", "increased")),
+         treatment = factor(treatment, levels = c("decreased", "control", "increased")))
+
+ggplot(newdata_habb, aes(x = SL_0,
+                         y = pred_mov,
+                         colour = treatment)) +
+  geom_line(aes(colour = treatment),
+            linewidth = 1) +
+  ylim(0, 1) +
+  geom_point(data = alt_data, aes(x = SL_0, 
+                                  y = as.numeric(hshift), 
+                                  fill = treatment, 
+                                  shape = treatment),
+             colour = "black", 
+             alpha = 0.75,
+             position = position_jitter(w = 0, h = 0.08)) +
+  scale_fill_manual(values = c("#ffb14e", "#cd34b5", "#0000ff")) +
+  scale_color_manual(values = c("#ffb14e", "#cd34b5", "#0000ff")) +
+  scale_shape_manual(values = c(25, 22, 24)) +
+  xlab("standard length (mm)") + 
+  ylab("predicted microhabitat change") +
+  theme_bw()
+```
