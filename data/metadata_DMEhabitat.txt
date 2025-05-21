@@ -1,0 +1,35 @@
+########################
+METADATA for "DMEhabitat.rda", published in De Bona et al 2025, Ecology.
+########################
+
+Each row of this data set corresponds to the habitat measurements made on a point-location along the experimental streams.
+
+- "stream":factorial variable defining the stream where the fish was captured. "CA" for Caigual, or "TA" for Taylor.
+
+- "streamID": factorial identifier of the stream section were the fish was captured. "CL1" and "CL2" for the first and second section of Caigual, respectively. "TL" for the experimental section of Taylor and "TM" for Taylor mouth, downstream of the experimental section.
+
+- "date": date when the habitat measurement was conducted. Format: YYYY-MM-DD.
+
+- "reach": factorial string defining the subsection of the stream where the fish was captured. Each subsection is defined by a letter, identifying its hydrological characteristics, and a range of distance (in meters) from the head barrier of the section. The initial letter can be "P" for pool, "R" for riffle, "N" for neither (intermediate between a pool and a riffle), "S" for sidepool, "B" for backwater. "PEX" identifies an extralimital pool, from which fish were captured to be added to the increased density treatment. Synonymous with location.
+
+- "cap_recap": string defining whether the measurements were made at the moment of capture ("cap") or recapture ("recap").
+
+- "x": numerical value defining the measurement position (in cm) along the x-axis of the stream (width). The 0 value represents the rough center of the stream width. Positive values represent river left, negative values river-right compared to the center.
+
+- "y": numerical value defining the measurement position (in meters) along the y-axis of the stream (length). The 0 value represents the upstream barrier.
+
+- "depth": numerical value defining the water depth (in centimeters) at that location.
+
+- "habitat": letter string defining the microhabitat type (or types) the measurement pertains to. The habitats are defined as one of five main habitat types: "A" for the "inflow" of the pool characterized by fast-running water and coarse substrate; "B" for a "beach" characterized by sandy substrate with shallow, and still water; "C" for "core" constituting the central portion of the pool, characterized by relatively slow-running, deep water, and with depositions of organic matter; "D" for "swamp" representing a marginal part of the pool, with still, shallow water and abundant organic matter deposition; "E" for a "run" of shallow yet fast-running part of the pool, leading to the outflow into the next section of the stream. In addition, we used the letters "R", definining a riffle, "BW", defining a backwater, and "F", defining an atypical microhabitat (free from fish). If a measurement was taken at the intersection of two or more microhabitat types, all types are reported, separated by a slash "/".
+
+- "flow": numerical measurement defining the water velocity (in m/s), measured with a flowmeter.
+
+- "substrate": character string defining the type of substrate present: "silt", "sand", "gravel", "pebbles", and "rock", from finest to coarsest. Intermediate substrate types, where 2 different coarseness levels are present, are defined by both types, separated by a slash "/", e.g. "gravel/pebbles".
+
+- "detritus": binary variable determining the presence (1) or absence (0) of fine organic sediment at the bottom of the stream in that point-location.
+
+- "leaves": binary variable determining the presence (1) or absence (0) of sunk leaf litter at the bottom of the stream in that point-location.
+
+- "submerged": binary variable defining whether the point-location of the measurement was submerged (1) or not (0, in the case of measurements taken from an emerged rock sitting above the water level).
+
+- "comments": additional comments.

@@ -186,6 +186,7 @@ pres <- ggplot(alt_data,
   scale_x_continuous(breaks = c(-0.5, 0, 0.5)) +
   scale_fill_manual(values = c("#ffb14e", "#cd34b5", "#0000ff")) +
   #scale_color_manual(values = c("#ffb14e", "#cd34b5", "#0000ff")) +
+  labs(shape = "Treatment", fill = "Treatment") +
   theme_bw() +
   theme(legend.position = "inside",
         legend.position.inside = c(0.80,0.85), 
@@ -226,6 +227,7 @@ plen <- ggplot(alt_data, aes(x = SL_0, y = growth_30, group)) +
             size = 0.5) +
   scale_shape_manual(values = c(21, 8)) +
   scale_color_manual(values = c("#fa8775", "#9d02d7")) +
+  labs(shape = "Dispersed", color = "Dispersed") +
   theme_bw() +
   theme(legend.position = "inside",
     legend.position.inside = c(0.85, .85),  
@@ -237,6 +239,11 @@ ggarrange(pres, plen, labels = c("a", "b"))
 
 jpeg(file.path(here::here(), "vignettes", "figures", "growth_by_treatment_and_dispersal.jpeg"),
      width = 8, height = 4.5, units = "in", res = 400)
+ggarrange(pres, plen, labels = c("a", "b"))
+dev.off()
+
+tiff(file.path(here::here(), "vignettes", "figures", "publication figures", "Figure 5.tif"),
+     width = 8, height = 4.5, units = "in", res = 600)
 ggarrange(pres, plen, labels = c("a", "b"))
 dev.off()
 ```
@@ -328,13 +335,18 @@ pgh <- ggplot(alt_data %>% filter(!is.na(hshift)), aes(x = SL_0, y = growth_30))
               labeller = labeller(treatment_f = labelss_treat)) +
   scale_color_manual(values = c("#fa8775", "#9d02d7")) +
   theme_bw() +
-  labs(linetype = "microhabitat \nshift",
-       color = "microhabitat \nshift",
-       shape = "microhabitat \nshift")
+  labs(linetype = "Microhabitat \nshift",
+       color = "Microhabitat \nshift",
+       shape = "Microhabitat \nshift")
 pgh
 
 jpeg(file.path(here::here(), "vignettes", "figures", "growth_by_habitat_and_treatment.jpeg"),
      width = 7, height = 4, units = "in", res = 400)
+pgh
+dev.off()
+
+tiff(file.path(here::here(), "vignettes", "figures", "publication figures", "Figure 7.tif"),
+     width = 7, height = 4, units = "in", res = 600)
 pgh
 dev.off()
 ```
@@ -468,7 +480,7 @@ cdp <- ggplot(cr_table, aes(x = moved,
   geom_boxplot(coef = 0,
                outliers = FALSE,
                alpha = 0.75) +
-  xlab("Dispersal") + ylab("Relative change in condition") +
+  xlab("Dispersed") + ylab("Relative change in condition") +
   ylim(c(-0.01, 0.015)) +
   geom_jitter(shape=21, position=position_jitter(0.02), alpha = 0.75) +
   scale_x_discrete(labels = c("NO", "YES")) +
@@ -575,6 +587,11 @@ jpeg(file.path(here::here(), "vignettes", "figures", "condition_by_dispersal.jpe
      width = 6, height = 3.5, units = "in", res = 400)
 ggarrange(cdp, c_dplot, labels = c("a", "b"))
 dev.off()
+
+tiff(file.path(here::here(), "vignettes", "figures", "publication figures", "Figure 6.tif"),
+     width = 6, height = 3.5, units = "in", res = 600)
+ggarrange(cdp, c_dplot, labels = c("a", "b"))
+dev.off()
 ```
 
 ### Condition & Habitat change
@@ -616,6 +633,11 @@ chp <- ggplot(cr_table %>% filter(!moved, !is.na(hshift)),
   ggtitle("Effect of density and habitat change on condition")
 
 chp
+
+jpeg(file.path(here::here(), "vignettes", "condition_habitat.jpeg"),
+     width = 7, height = 5, units = "in", res = 300)
+chp
+dev.off()
 ```
 
 These results are intentionally left out of the paper, since the number of analyses is already limiting in reducing the scope of the study to a clear message.
@@ -728,7 +750,7 @@ pr <- ggplot(recruits,
   scale_x_continuous(breaks = c(-0.5, 0., 0.5)) +
   scale_shape_manual(values = c(16,17,15)) +
   scale_color_manual(values=c("#DAA323", "#691E92", "#199958")) +
-  labs(y = "Recruitment difference (± SE)", x = "Poportional change in density", 
+  labs(y = "Recruitment difference (± SE)", x = "Proportional change in density", 
        color = "Stream", linetype = "Stream", shape = "Stream") +
   theme_bw()
 
@@ -736,6 +758,11 @@ pr
 
 jpeg(file.path(here::here(), "vignettes", "figures", "pool_level_recruitment.jpeg"),
      width = 5, height = 3.5, units = "in", res = 400)
+pr
+dev.off()
+
+tiff(file.path(here::here(), "vignettes", "figures", "publication figures", "Figure 2.tif"),
+     width = 5, height = 3.5, units = "in", res = 600)
 pr
 dev.off()
 ```
@@ -861,6 +888,11 @@ p
 
 jpeg(file.path(here::here(), "vignettes", "figures", "pool_level_survival.jpeg"),
      width = 8, height = 5, units = "in", res = 400)
+p
+dev.off()
+
+tiff(file.path(here::here(), "vignettes", "figures", "publication figures", "Figure 1.tif"),
+     width = 8, height = 5, units = "in", res = 600)
 p
 dev.off()
 ```

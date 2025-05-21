@@ -1,0 +1,47 @@
+########################
+METADATA for "DMEdata.rda", published in De Bona et al 2025, Ecology.
+########################
+
+Each row corresponds to the processing of an individual fish.
+
+- "processingDate": date when the individual fish was anesthetized (if larger than 10mm), marked (1st capture only), measured and weighed. Format: YYYY-MM-DD.
+
+- "captureDate": date when the individual fish was captured from the stream. Format: YYYY-MM-DD.
+
+- "markID": factorial value determining the mark identifying the fish. Marks are unique if the individual fish is larger than ~13 mm, cohort marks (unique to each combination of stream, microhabitat, and size to the nearest mm), if the individual is between 10 and 13 mm, and a dummy mark (not a physical mark, just a digital identifyer), if an individual is < 10 mm.
+
+- "tank": factorial identifier of the tank where the fish was housed while in the laboratory.
+
+- "bag": factorial identifier of the bag where the formaldehyde-preserved fish was stored after being euthanized."NA" if the fish was released back to the place of origin after the experiment ended.
+
+- "sex": single letter identifying the sex of the individual fish. "F" for female, "M" for mature male, "I" for immature male, "B" for non-anesthetized "baby"" fish.
+
+- "SL": numerical value defining the standard length in mm, calculated from the tip of the snout to the most distal insertion point of the caudal fin rays.
+
+- "weight": numerical value defining the weight of the fish in grams.
+
+- "stream": factorial variable defining the stream where the fish was captured. "CAIGUAL" or "TAYLOR".
+
+- "streamID": factorial identifier of the stream section were the fish was captured. "CL1" and "CL2" for the first and second section of Caigual, respectively. "TL" for the experimental section of Taylor and "TM" for Taylor mouth, downstream of the experimental section.
+
+- "location": factorial string defining the subsection of the stream where the fish was captured. Each subsection is defined by a letter, identifying its hydrological characteristics, and a range of distance (in meters) from the head barrier of the section. The initial letter can be "P" for pool, "R" for riffle, "N" for neither (intermediate between a pool and a riffle), "S" for sidepool, "B" for backwater. "PEX" identifies an extralimital pool, from which fish were captured to be added to the increased density treatment.
+
+- "habitat": single letter factor defining the microhabitat type where the fish was capture, within a location. "A" for the "inflow" of the pool characterized by fast-running water and coarse substrate. "B" for a "beach" characterized by sandy substrate with shallow, and still water. "C" for "core" constituting the central portion of the pool, characterized by relatively slow-running, deep water, and with depositions of organic matter. "D" for "swamp" representing a marginal part of the pool, with still, shallow water and abundant organic matter deposition. "E" for a "run" of shallow yet fast-running part of the pool, leading to the outflow into the next section of the stream.
+
+- "treatment": factorial variable defining the treatment each fish was subject to. "C" for control treatment. Fish assigned to this treatment were captured and released in the same control pool, with density left unaltered. "I" for increased treatment. Fish captured in the pool where density was to be increased. These are the resident fish, which would be reintroduced in the increased density pool, together with other fish (see below). The analyses of the effects of density will be restricted to these resident fish, experiencing higher density. "E" for "extralimital". Fish captured elsewhere (outside the manipulated reach), to be introduced in the increased treatment. "D" for decreased treatment. Fish captured in the pool where density will be decreased, and that will be released back into the same pool. These are the resident fish that stay, to experience to lower density. "R" for removed fish. Fish captured in the pool where density will be decreased, but that won't be released back into the same pool. They will be displaced downstream, allowing a decrease in density. "XR" for accidentally removed fish. In the streamID TL two bottles belonging to different pools were mixed together by accident, in the laboratory. These 20+27 fish were removed from the reach. The individuals marked "XR" are the fish that are considered as removed from the decreased density pool (one of the mixed up pools). These fish will be counted when establishing how many fish were removed from TL. "X" for accidentally removed fish, from the increased density pool. These fish were also mixed up (see above). We had to remove them from the increased pool. These fish will be counted when establishing the original density of the increased pool in TL.
+
+- "releaseDate": date when the individual fish was released back to the stream. Format: YYYY-MM-DD.
+
+- "markerID": factorial identifier of the individual researcher marking and measuring the fish.
+
+- "recap": binary value defining whether the data corresponds to the initial capture (0) or the recapture (1).
+
+- "formaline": binary value defining whether the fish was euthanized and preserved for gut analyses (not presented here)
+
+- "comments": additional comments.
+
+- "patchID": character variable derivative of "location", defining the subsection in a conserved way between capture and recapture events.
+
+- "isbabyMark": logical value defining whether the fish received a digital-only mark (TRUE, for fish < 10mm) or not (FALSE).
+
+- "isCohort": logical value defining whether the fish received a cohort mark (TRUE) or not (FALSE).

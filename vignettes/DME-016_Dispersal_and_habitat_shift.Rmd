@@ -271,6 +271,7 @@ pd <- ggplot(newdata_disp, aes(x = SL_0, y = fitted, colour = sex)) +
   scale_fill_manual(values = c("#1E88E5", "#FFC107", "#004D40")) +
   xlab("Standard length (mm)") +
   ylab("Dispersal probability") +
+  labs(fill = "Sex", color = "Sex") +
   theme_bw()
 
 pd
@@ -279,6 +280,12 @@ pd
 dir.create(file.path(here::here(), "vignettes", "figures"))
 jpeg(file.path(here::here(), "vignettes", "figures", "dispersal_p_by_sex.jpeg"),
      width = 7, height = 5, units = "in", res = 400)
+pd
+dev.off()
+
+dir.create(file.path(here::here(), "vignettes", "figures", "publication figures"))
+tiff(file.path(here::here(), "vignettes", "figures", "publication figures", "Figure 3.tif"),
+     width = 7, height = 5, units = "in", res = 600)
 pd
 dev.off()
 ```
@@ -438,12 +445,18 @@ ph <- ggplot(newdata_hab, aes(x = SL_0,
   scale_color_manual(values = c("#ffb14e", "#cd34b5", "#0000ff")) +
   scale_shape_manual(values = c(25, 22, 24)) +
   xlab("Standard length (mm)") + ylab("Predicted microhabitat change (p)") +
+  labs(fill = "Treatment", color = "Treatment", shape = "Treatment") +
   theme_bw()
 ph
 
 # saving plot
 jpeg(file.path(here::here(), "vignettes", "figures", "microhabitat_shift_by_treatment.jpeg"),
      width = 7, height = 5, units = "in", res = 400)
+ph
+dev.off()
+
+tiff(file.path(here::here(), "vignettes", "figures", "publication figures", "Figure 4.tif"),
+     width = 7, height = 5, units = "in", res = 600)
 ph
 dev.off()
 ```
