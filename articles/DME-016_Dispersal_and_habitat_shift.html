@@ -1645,8 +1645,13 @@ recorded size for each of the three sex-stage categories.</p>
 <pre><code><span><span class="co">## agg_png </span></span>
 <span><span class="co">##       2</span></span></code></pre>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"figures"</span>, <span class="st">"publication figures"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">tiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"figures"</span>, <span class="st">"publication figures"</span>, <span class="st">"Figure 3.tif"</span><span class="op">)</span>,</span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"figures"</span>, <span class="st">"publication figures"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning in dir.create(file.path(here::here(), "vignettes", "figures",</span></span>
+<span><span class="co">## "publication figures")):</span></span>
+<span><span class="co">## '/home/runner/work/guppyDme/guppyDme/vignettes/figures/publication figures'</span></span>
+<span><span class="co">## already exists</span></span></code></pre>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">tiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"figures"</span>, <span class="st">"publication figures"</span>, <span class="st">"Figure 3.tif"</span><span class="op">)</span>,</span>
 <span>     width <span class="op">=</span> <span class="fl">7</span>, height <span class="op">=</span> <span class="fl">5</span>, units <span class="op">=</span> <span class="st">"in"</span>, res <span class="op">=</span> <span class="fl">600</span><span class="op">)</span></span>
 <span><span class="va">pd</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
@@ -1659,7 +1664,7 @@ recorded size for each of the three sex-stage categories.</p>
 <p>Again, let’s first visualize what type of habitat change we observe
 in the three different pools, among individuals that stayed and left the
 pool.</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mat</span> <span class="op">&lt;-</span> <span class="va">cr_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">treatment</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"C"</span>, <span class="st">"D"</span>, <span class="st">"I"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">habitat_0</span>, <span class="va">habitat_1</span>, <span class="va">treatment</span>, <span class="va">moved</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -1725,7 +1730,7 @@ pool.</p>
 <span><span class="co">##         C  3  0  4  1  0</span></span>
 <span><span class="co">##         D  1  0  5  0  1</span></span>
 <span><span class="co">##         E  0  0  0  0  0</span></span></code></pre>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pool_lables</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"C"</span> <span class="op">=</span> <span class="st">"control"</span>,</span>
 <span>                <span class="st">"D"</span> <span class="op">=</span> <span class="st">"decreased"</span>,</span>
 <span>                <span class="st">"I"</span> <span class="op">=</span> <span class="st">"increased"</span><span class="op">)</span></span>
@@ -1753,7 +1758,7 @@ to shift microhabitat might therefore be confounded.</p>
 full model that includes treatment as a factor (the model is rank
 deficient). To account for asymmetries in the response to density we
 will instead include a quadratic term.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Here, individuals who stayed are filtered</span></span>
 <span><span class="va">h1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">glmer</a></span><span class="op">(</span><span class="va">hshift</span> <span class="op">~</span> <span class="va">SL_0s</span><span class="op">*</span><span class="va">sex_stage_0</span><span class="op">*</span><span class="va">density_factor</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">density_factor</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">streamID</span><span class="op">)</span>,</span>
 <span>            offset <span class="op">=</span> <span class="va">interval</span>,</span>
@@ -1829,7 +1834,7 @@ will instead include a quadratic term.</p>
 <span><span class="co">## SL_0s       -0.015              </span></span>
 <span><span class="co">## densty_fctr -0.002 -0.056       </span></span>
 <span><span class="co">## SL_0s:dnst_  0.005  0.085 -0.308</span></span></code></pre>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># displaying model comparison</span></span>
 <span><span class="fu">stargazer</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stargazer/man/stargazer.html" class="external-link">stargazer</a></span><span class="op">(</span><span class="va">h1</span>, <span class="va">h2</span>, <span class="va">h3</span>, <span class="va">h4</span>, <span class="va">h5</span>, <span class="va">h6</span>,</span>
 <span>                     type <span class="op">=</span> <span class="st">"html"</span>, report <span class="op">=</span> <span class="op">(</span><span class="st">'vcp*'</span><span class="op">)</span>,</span>
@@ -2724,7 +2729,7 @@ that are either inaccessible to smaller individuals (e.g. drift
 feeding), or by holding them preferentially even when density is high
 (context-competition like dynamic).</p>
 <p>Below, we visualize the results with a plot.</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># defining some representative points for density manipulation (50%, 100%, 150%)</span></span>
 <span><span class="va">ds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.5</span>, <span class="fl">0</span>, <span class="fl">0.5</span><span class="op">)</span></span>
 <span></span>
@@ -2790,24 +2795,24 @@ feeding), or by holding them preferentially even when density is high
 <pre><code><span><span class="co">## Warning: Removed 201 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">## (`geom_point()`).</span></span></code></pre>
 <p><img src="DME-016_Dispersal_and_habitat_shift_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># saving plot</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">jpeg</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"figures"</span>, <span class="st">"microhabitat_shift_by_treatment.jpeg"</span><span class="op">)</span>,</span>
 <span>     width <span class="op">=</span> <span class="fl">7</span>, height <span class="op">=</span> <span class="fl">5</span>, units <span class="op">=</span> <span class="st">"in"</span>, res <span class="op">=</span> <span class="fl">400</span><span class="op">)</span></span>
 <span><span class="va">ph</span></span></code></pre></div>
 <pre><code><span><span class="co">## Warning: Removed 184 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">## (`geom_point()`).</span></span></code></pre>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## agg_png </span></span>
 <span><span class="co">##       2</span></span></code></pre>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">tiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"figures"</span>, <span class="st">"publication figures"</span>, <span class="st">"Figure 4.tif"</span><span class="op">)</span>,</span>
 <span>     width <span class="op">=</span> <span class="fl">7</span>, height <span class="op">=</span> <span class="fl">5</span>, units <span class="op">=</span> <span class="st">"in"</span>, res <span class="op">=</span> <span class="fl">600</span><span class="op">)</span></span>
 <span><span class="va">ph</span></span></code></pre></div>
 <pre><code><span><span class="co">## Warning: Removed 197 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">## (`geom_point()`).</span></span></code></pre>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## agg_png </span></span>
 <span><span class="co">##       2</span></span></code></pre>
@@ -2815,7 +2820,7 @@ feeding), or by holding them preferentially even when density is high
 factorial variable (model was rank deficient), we will briefly refit the
 selected model with treatment as a factor instead of a continuous
 variable, and compare the results.</p>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># refitting model with categorical variable</span></span>
 <span><span class="va">h6b</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">glmer</a></span><span class="op">(</span><span class="va">hshift</span> <span class="op">~</span>  <span class="va">SL_0s</span><span class="op">*</span><span class="va">treatment</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">streamID</span><span class="op">)</span>,</span>
 <span>            offset <span class="op">=</span> <span class="va">interval</span>,</span>
@@ -2861,12 +2866,12 @@ variable, and compare the results.</p>
 <span><span class="co">## treatmentI  -0.091 -0.033  0.211              </span></span>
 <span><span class="co">## SL_0s:trtmD -0.006 -0.514 -0.130  0.035       </span></span>
 <span><span class="co">## SL_0s:trtmI  0.002 -0.548  0.000 -0.099  0.268</span></span></code></pre>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/AIC.html" class="external-link">AIC</a></span><span class="op">(</span><span class="va">h6</span>, <span class="va">h6b</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##     df      AIC</span></span>
 <span><span class="co">## h6   5 364.1382</span></span>
 <span><span class="co">## h6b  7 366.3683</span></span></code></pre>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># plotting</span></span>
 <span><span class="va">tts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"C"</span>, <span class="st">"D"</span>, <span class="st">"I"</span><span class="op">)</span></span>
 <span></span>
@@ -2920,7 +2925,7 @@ variable, and compare the results.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
       </footer>
