@@ -227,7 +227,7 @@ plen <- ggplot(alt_data, aes(x = SL_0, y = growth_30, group)) +
             size = 0.5) +
   scale_shape_manual(values = c(21, 8)) +
   scale_color_manual(values = c("#fa8775", "#9d02d7")) +
-  labs(shape = "Dispersed", color = "Dispersed") +
+  labs(shape = "Dispersed", color = "Dispersed", linetype = "Dispersed") +
   theme_bw() +
   theme(legend.position = "inside",
     legend.position.inside = c(0.85, .85),  

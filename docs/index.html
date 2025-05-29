@@ -56,16 +56,16 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="articles/DME-000_Tidy_data.html">Spread and Shrink Dataset</a>
+      <a href="articles/DME-000_Tidy_data.html">Tidy the Data</a>
     </li>
     <li>
-      <a href="articles/DME-011_Measurement_consistency.html">Measurement consistency</a>
+      <a href="articles/DME-011_Measurement_consistency.html">Measurement Consistency</a>
     </li>
     <li>
-      <a href="articles/DME-010_Habitat_characteristics.html">Habitat characteristics</a>
+      <a href="articles/DME-010_Habitat_characteristics.html">Habitat Characteristics</a>
     </li>
     <li>
-      <a href="articles/DME-015_Habitat_area.html">Habitat area</a>
+      <a href="articles/DME-015_Habitat_area.html">Habitat Area</a>
     </li>
     <li>
       <a href="articles/DME-016_Dispersal_and_habitat_shift.html">Dispersal and Habitat shift</a>
@@ -84,7 +84,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://gitlab.com/sebadebona/guppyDME" class="external-link">
+  <a href="https://github.com/sebastianodebona/guppyDme" class="external-link">
     <span class="fa fa-github fa-lg"></span>
 
   </a>
@@ -101,44 +101,46 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-
 <div class="section level1">
 <div class="page-header"><h1 id="density-manipulation-experiment">Density Manipulation Experiment<a class="anchor" aria-label="anchor" href="#density-manipulation-experiment"></a>
 </h1></div>
 <p>This project analyzes the data from a Density Manipulation Experiment conducted in Trinidad in 2018, to study the effect of population density perturbations on dispersal and habitat use, using natural populations of guppies as a study system. The project constitutes part of Sebastiano De Bona’s PhD thesis.</p>
-<p>The analysis can be reproduced by cloning the project and going manually through the vignettes, in order; or by installing the package <code>guppyDME</code> and running <code><a href="https://pkgdown.r-lib.org/reference/build_site.html" class="external-link">pkgdown::build_site()</a></code> to run all vignettes at once.</p>
+<p>The analysis can be reproduced by cloning the project and going manually through the vignettes, in order; or by installing the package <code>guppyDme</code> and running <code><a href="https://pkgdown.r-lib.org/reference/build_site.html" class="external-link">pkgdown::build_site()</a></code> to run all vignettes at once.</p>
 <p>The output of the analyses can be seen here:</p>
 <ul>
-<li><a href="https://" class="external-link">Link</a></li>
+<li><a href="https://sebastianodebona.github.io/guppyDme/">Link</a></li>
 </ul>
 <div class="section level2">
-<h2 id="how-to-clone-this-project-locally">How to clone this project locally<a class="anchor" aria-label="anchor" href="#how-to-clone-this-project-locally"></a>
+<h2 id="do-i-have-to-install-the-package">Do I have to install the package?<a class="anchor" aria-label="anchor" href="#do-i-have-to-install-the-package"></a>
 </h2>
-<p>If you have access to the GitHub repository, you can clone this project remotely by opening a terminal and typing:</p>
-<pre><code>git clone </code></pre>
+<p>No! If you don’t want to install the package, simply clone it and open the <code>.Rmd</code> files, in order, from the <code>vignettes/</code> folder. There you’ll find everything you need to reproduce the analyses.</p>
 </div>
 <div class="section level2">
-<h2 id="how-to-prepare-your-r-for-the-analyses">How to prepare your R for the analyses<a class="anchor" aria-label="anchor" href="#how-to-prepare-your-r-for-the-analyses"></a>
+<h2 id="how-to-install-the-package-if-you-want-to">How to install the package, if you want to<a class="anchor" aria-label="anchor" href="#how-to-install-the-package-if-you-want-to"></a>
 </h2>
-<p>A preparation step is required before the analyses, and it entails installing a list of required packages. Copy-paste the following code in R or RStudio and execute:</p>
+<p>You can install the <code>guppyDme</code> package locally, by typing.</p>
+<pre><code><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"sebastianodebona/guppyDme"</span><span class="op">)</span></span></code></pre>
+</div>
+<div class="section level2">
+<h2 id="if-the-installation-doesnt-work">If the installation doesn’t work?<a class="anchor" aria-label="anchor" href="#if-the-installation-doesnt-work"></a>
+</h2>
+<p>You might require a preparation step, installing a list of required packages. Copy-paste the following code in R or RStudio and execute:</p>
 <pre><code><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'car'</span>, <span class="st">'devtools'</span>, <span class="st">'FactoMineR'</span>, <span class="st">'factoextra'</span>, <span class="st">'ggplot2'</span>, <span class="st">'ggpubr'</span>, <span class="st">'here'</span>, <span class="st">'knitr'</span>, <span class="st">'lme4'</span>, <span class="st">'lmerTest'</span>, <span class="st">'lubridate'</span>, <span class="st">'magrittr'</span>, <span class="st">'mlogit'</span>, <span class="st">'pkgdown'</span>, <span class="st">'plyr'</span>, <span class="st">'rmarkdown'</span>, <span class="st">'roxygen2'</span>, <span class="st">'rtf'</span>, <span class="st">'scales'</span>, <span class="st">'stargazer'</span>, <span class="st">'tidyverse'</span><span class="op">)</span><span class="op">)</span></span></code></pre>
 </div>
-</div>
-<div class="section level1">
-<h1 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
-</h1>
+<div class="section level2">
+<h2 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
+</h2>
 <p>The package comes with two datafiles attached: <code>DMEdata.Rda</code> and <code>DMEhabitat.Rda</code>.</p>
 </div>
-
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li><a href="https://gitlab.com/sebadebona/density-manipulation-experiment/" class="external-link">Browse source code</a></li>
-<li><a href="https://gitlab.com/sebadebona/density-manipulation-experiment/issues" class="external-link">Report a bug</a></li>
-<li><a href="https://gitlab.com/sebadebona/guppyDME" class="external-link">Browse source code at</a></li>
+<li><a href="https://sebastianodebona.github.io/guppyDme/issues">Report a bug</a></li>
+<li><a href="https://github.com/sebastianodebona/guppyDme" class="external-link">Browse source code at</a></li>
 </ul>
 </div>
 

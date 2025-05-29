@@ -55,16 +55,16 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/DME-000_Tidy_data.html">Spread and Shrink Dataset</a>
+      <a href="../articles/DME-000_Tidy_data.html">Tidy the Data</a>
     </li>
     <li>
-      <a href="../articles/DME-011_Measurement_consistency.html">Measurement consistency</a>
+      <a href="../articles/DME-011_Measurement_consistency.html">Measurement Consistency</a>
     </li>
     <li>
-      <a href="../articles/DME-010_Habitat_characteristics.html">Habitat characteristics</a>
+      <a href="../articles/DME-010_Habitat_characteristics.html">Habitat Characteristics</a>
     </li>
     <li>
-      <a href="../articles/DME-015_Habitat_area.html">Habitat area</a>
+      <a href="../articles/DME-015_Habitat_area.html">Habitat Area</a>
     </li>
     <li>
       <a href="../articles/DME-016_Dispersal_and_habitat_shift.html">Dispersal and Habitat shift</a>
@@ -83,7 +83,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://gitlab.com/sebadebona/guppyDME" class="external-link">
+  <a href="https://github.com/sebastianodebona/guppyDme" class="external-link">
     <span class="fa fa-github fa-lg"></span>
 
   </a>
@@ -106,7 +106,7 @@
 Bona</h4>
             
       
-      <small class="dont-index">Source: <a href="https://gitlab.com/sebadebona/density-manipulation-experiment/blob/HEAD/vignettes/DME-020_Density_dependence.Rmd" class="external-link"><code>vignettes/DME-020_Density_dependence.Rmd</code></a></small>
+
       <div class="hidden name"><code>DME-020_Density_dependence.Rmd</code></div>
 
     </div>
@@ -186,7 +186,7 @@ traits when density is increased, and viceversa when it’s decreased.</p>
 <span></span>
 <span><span class="co">#### If you have the guppyDme package installed</span></span>
 <span><span class="co"># loading package</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://gitlab.com/sebadebona/density-manipulation-experiment" class="external-link">guppyDme</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sebastianodebona.github.io/guppyDme/">guppyDme</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># #### If you do NOT wish to install the guppyDme package, please uncomment and run the following two lines of code, adding the package functions to the Global Environment and loading the data</span></span>
 <span><span class="co"># source(file.path(here::here(), "R", "package_functions.R"))</span></span>
@@ -196,8 +196,8 @@ traits when density is increased, and viceversa when it’s decreased.</p>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">DMEdata</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>sex_stage <span class="op">=</span> <span class="fu">score_sexst</span><span class="op">(</span><span class="va">.</span>, f_threshold <span class="op">=</span> <span class="fl">14</span>, f_unit <span class="op">=</span> <span class="st">"SL"</span><span class="op">)</span>,</span>
 <span>         sex_stage <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">sex_stage</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"I"</span>, <span class="st">"M"</span>, <span class="st">"F"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">cr_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"DME_cr_data.rds"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">treatment_tab</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>,</span>
+<span><span class="va">cr_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"DME_cr_data.rds"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">treatment_tab</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>,</span>
 <span>                                   <span class="st">"DME_density_factor_in_treatments.rds"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>To make the interpretation of the following analyses easier, we will
 center the variable <code>density_factor</code> (representing by how
@@ -1264,6 +1264,7 @@ the results.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_continuous</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.5</span>, <span class="fl">0</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#ffb14e"</span>, <span class="st">"#cd34b5"</span>, <span class="st">"#0000ff"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="co">#scale_color_manual(values = c("#ffb14e", "#cd34b5", "#0000ff")) +</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="st">"Treatment"</span>, fill <span class="op">=</span> <span class="st">"Treatment"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"inside"</span>,</span>
 <span>        legend.position.inside <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.80</span>,<span class="fl">0.85</span><span class="op">)</span>, </span>
@@ -1304,6 +1305,7 @@ the results.</p>
 <span>            size <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_shape_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">21</span>, <span class="fl">8</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#fa8775"</span>, <span class="st">"#9d02d7"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="st">"Dispersed"</span>, color <span class="op">=</span> <span class="st">"Dispersed"</span>, linetype <span class="op">=</span> <span class="st">"Dispersed"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"inside"</span>,</span>
 <span>    legend.position.inside <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.85</span>, <span class="fl">.85</span><span class="op">)</span>,  </span>
@@ -1318,8 +1320,15 @@ the results.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rpkgs.datanovia.com/ggpubr/reference/ggarrange.html" class="external-link">ggarrange</a></span><span class="op">(</span><span class="va">pres</span>, <span class="va">plen</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="DME-020_Density_dependence_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">jpeg</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"figures"</span>, <span class="st">"growth_by_treatment_and_dispersal.jpeg"</span><span class="op">)</span>,</span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">jpeg</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"figures"</span>, <span class="st">"growth_by_treatment_and_dispersal.jpeg"</span><span class="op">)</span>,</span>
 <span>     width <span class="op">=</span> <span class="fl">8</span>, height <span class="op">=</span> <span class="fl">4.5</span>, units <span class="op">=</span> <span class="st">"in"</span>, res <span class="op">=</span> <span class="fl">400</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rpkgs.datanovia.com/ggpubr/reference/ggarrange.html" class="external-link">ggarrange</a></span><span class="op">(</span><span class="va">pres</span>, <span class="va">plen</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## agg_png </span></span>
+<span><span class="co">##       2</span></span></code></pre>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">tiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"figures"</span>, <span class="st">"publication figures"</span>, <span class="st">"Figure 5.tif"</span><span class="op">)</span>,</span>
+<span>     width <span class="op">=</span> <span class="fl">8</span>, height <span class="op">=</span> <span class="fl">4.5</span>, units <span class="op">=</span> <span class="st">"in"</span>, res <span class="op">=</span> <span class="fl">600</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rpkgs.datanovia.com/ggpubr/reference/ggarrange.html" class="external-link">ggarrange</a></span><span class="op">(</span><span class="va">pres</span>, <span class="va">plen</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## agg_png </span></span>
@@ -1336,7 +1345,7 @@ shift</em> on growth for individuals who remain. We might expect that
 individuals who moved to a different habitat would grow more. If the
 opposite is true, this could suggest individuals being forced into
 suboptimal habitats and paying the consequences in terms of growth.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># we'll try to model with density as a continuous variable first</span></span>
 <span><span class="va">gh0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lmerTest/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span><span class="va">growth_30</span> <span class="op">~</span> <span class="va">SL_0s</span><span class="op">*</span><span class="va">hshift</span><span class="op">*</span><span class="va">density_factor</span> <span class="op">+</span></span>
 <span>                   <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">streamID</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">marker_seq</span><span class="op">)</span>,</span>
@@ -1375,7 +1384,7 @@ suboptimal habitats and paying the consequences in terms of growth.</p>
 <pre><code><span><span class="co">##      df      AIC</span></span>
 <span><span class="co">## gh4   7 778.8988</span></span>
 <span><span class="co">## gh0b 15 782.1826</span></span></code></pre>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># the difference in AIC is small, so I will consider the most complex model</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">gh0b</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Linear mixed model fit by REML. t-tests use Satterthwaite's method [</span></span>
@@ -1439,7 +1448,7 @@ suboptimal habitats and paying the consequences in terms of growth.</p>
 <span><span class="co">## trtmnI:TRUE               </span></span>
 <span><span class="co">## SL_0:D:TRUE -0.075        </span></span>
 <span><span class="co">## SL_0:I:TRUE -0.413  0.285</span></span></code></pre>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">gh4</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Linear mixed model fit by REML. t-tests use Satterthwaite's method [</span></span>
 <span><span class="co">## lmerModLmerTest]</span></span>
@@ -1476,7 +1485,7 @@ suboptimal habitats and paying the consequences in terms of growth.</p>
 <span><span class="co">## densty_fctr  0.026  0.000 -0.212</span></span></code></pre>
 <p>Let’s plot the data together with the predictions from the factorial
 treatment model.</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">cr_table</span><span class="op">$</span><span class="va">treatment</span><span class="op">)</span></span>
 <span><span class="va">hs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NO"</span>, <span class="st">"YES"</span><span class="op">)</span></span>
 <span></span>
@@ -1513,14 +1522,21 @@ treatment model.</p>
 <span>              labeller <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labeller.html" class="external-link">labeller</a></span><span class="op">(</span>treatment_f <span class="op">=</span> <span class="va">labelss_treat</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#fa8775"</span>, <span class="st">"#9d02d7"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>linetype <span class="op">=</span> <span class="st">"microhabitat \nshift"</span>,</span>
-<span>       color <span class="op">=</span> <span class="st">"microhabitat \nshift"</span>,</span>
-<span>       shape <span class="op">=</span> <span class="st">"microhabitat \nshift"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>linetype <span class="op">=</span> <span class="st">"Microhabitat \nshift"</span>,</span>
+<span>       color <span class="op">=</span> <span class="st">"Microhabitat \nshift"</span>,</span>
+<span>       shape <span class="op">=</span> <span class="st">"Microhabitat \nshift"</span><span class="op">)</span></span>
 <span><span class="va">pgh</span></span></code></pre></div>
 <p><img src="DME-020_Density_dependence_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">jpeg</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"figures"</span>, <span class="st">"growth_by_habitat_and_treatment.jpeg"</span><span class="op">)</span>,</span>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">jpeg</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"figures"</span>, <span class="st">"growth_by_habitat_and_treatment.jpeg"</span><span class="op">)</span>,</span>
 <span>     width <span class="op">=</span> <span class="fl">7</span>, height <span class="op">=</span> <span class="fl">4</span>, units <span class="op">=</span> <span class="st">"in"</span>, res <span class="op">=</span> <span class="fl">400</span><span class="op">)</span></span>
+<span><span class="va">pgh</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## agg_png </span></span>
+<span><span class="co">##       2</span></span></code></pre>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">tiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"figures"</span>, <span class="st">"publication figures"</span>, <span class="st">"Figure 7.tif"</span><span class="op">)</span>,</span>
+<span>     width <span class="op">=</span> <span class="fl">7</span>, height <span class="op">=</span> <span class="fl">4</span>, units <span class="op">=</span> <span class="st">"in"</span>, res <span class="op">=</span> <span class="fl">600</span><span class="op">)</span></span>
 <span><span class="va">pgh</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## agg_png </span></span>
@@ -1558,7 +1574,7 @@ assessed for males and immature females.</p>
 <p>Here I am just plotting weight over length to visualize the
 relationship and see if there are crazy outliers that need to be
 checked.</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">labelss_recap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0"</span> <span class="op">=</span> <span class="st">"capture"</span>,</span>
 <span>                   <span class="st">"1"</span> <span class="op">=</span> <span class="st">"recapture"</span><span class="op">)</span></span>
 <span></span>
@@ -1589,7 +1605,7 @@ over 30 days, as:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi>c</mi><mi>o</mi><mi>n</mi><mi>d</mi><mi>i</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mn>1</mn></msub><mo>−</mo><mi>c</mi><mi>o</mi><mi>n</mi><mi>d</mi><mi>i</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mn>0</mn></msub></mrow><mrow><mi>c</mi><mi>o</mi><mi>n</mi><mi>d</mi><mi>i</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mn>0</mn></msub></mrow></mfrac><mfrac><mn>1</mn><mrow><mi>i</mi><mi>n</mi><mi>t</mi><mi>e</mi><mi>r</mi><mi>v</mi><mi>a</mi><mi>l</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">
 \frac{condition_1 - condition_0}{condition_0} \frac{1}{interval}
 </annotation></semantics></math></p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cr_table</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/compound.html" class="external-link">%&lt;&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>condition_0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">sex_stage_0</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"I"</span>, <span class="st">"M"</span><span class="op">)</span>, </span>
 <span>                              <span class="va">weight_0</span><span class="op">*</span><span class="fl">1000</span><span class="op">/</span><span class="op">(</span><span class="va">SL_0</span><span class="op">^</span><span class="fl">3</span><span class="op">)</span>,</span>
@@ -1603,13 +1619,13 @@ over 30 days, as:</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">cr_table</span><span class="op">$</span><span class="va">cond_diff_30</span><span class="op">)</span></span></code></pre></div>
 <p><img src="DME-020_Density_dependence_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">cr_table</span><span class="op">$</span><span class="va">rel_cond_change</span><span class="op">)</span></span></code></pre></div>
 <p><img src="DME-020_Density_dependence_files/figure-html/unnamed-chunk-12-2.png" width="700"></p>
 <p>We can now test the effect of density on condition. We will adopt a
 stepwise model simplification by removing non-significant interactions
 and main effects, as we have done so far.</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">c0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lmerTest/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span><span class="va">cond_diff_30</span> <span class="op">~</span> <span class="va">SL_0s</span> <span class="op">*</span> <span class="va">density_factor</span> <span class="op">*</span> <span class="va">moved</span> <span class="op">+</span></span>
 <span>                   <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">marker_seq</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">streamID</span><span class="op">)</span>,</span>
 <span>                 data <span class="op">=</span> <span class="va">cr_table</span>,</span>
@@ -1645,7 +1661,7 @@ and main effects, as we have done so far.</p>
 <span>                 data <span class="op">=</span> <span class="va">cr_table</span>,</span>
 <span>                 na.action <span class="op">=</span> <span class="va">na.omit</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## boundary (singular) fit: see help('isSingular')</span></span></code></pre>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">c6</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Linear mixed model fit by REML. t-tests use Satterthwaite's method [</span></span>
 <span><span class="co">## lmerModLmerTest]</span></span>
@@ -1677,7 +1693,7 @@ and main effects, as we have done so far.</p>
 <span><span class="co">## movedTRUE -0.319</span></span>
 <span><span class="co">## optimizer (nloptwrap) convergence code: 0 (OK)</span></span>
 <span><span class="co">## boundary (singular) fit: see help('isSingular')</span></span></code></pre>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">c0</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">c1</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">c2</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">c3</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">c4</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">c5</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">c6</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"lmerMod"</span></span>
 <span><span class="fu">stargazer</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stargazer/man/stargazer.html" class="external-link">stargazer</a></span><span class="op">(</span><span class="va">c0</span>, <span class="va">c1</span>, <span class="va">c2</span>, <span class="va">c3</span>, <span class="va">c4</span>, <span class="va">c5</span>, <span class="va">c6</span>,</span>
 <span>                     type <span class="op">=</span> <span class="st">"html"</span>, report <span class="op">=</span> <span class="op">(</span><span class="st">'vcp*'</span><span class="op">)</span>,</span>
@@ -2356,7 +2372,7 @@ trend observed seems to be mostly determined by what happens in the
 control treatment (very few datapoints all together).</p>
 <p>Once again, we can run a model with treatment as a categorical
 variable to check for asymmetries.</p>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">c0b</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lmerTest/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span><span class="va">cond_diff_30</span> <span class="op">~</span> <span class="va">SL_0s</span> <span class="op">*</span> <span class="va">treatment</span> <span class="op">*</span> <span class="va">moved</span> <span class="op">+</span></span>
 <span>                   <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">marker_seq</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">streamID</span><span class="op">)</span>,</span>
 <span>                 data <span class="op">=</span> <span class="va">cr_table</span>,</span>
@@ -2424,7 +2440,7 @@ variable to check for asymmetries.</p>
 <span><span class="co">## trtmnI:TRUE               </span></span>
 <span><span class="co">## SL_0:D:TRUE  0.421        </span></span>
 <span><span class="co">## SL_0:I:TRUE  0.815  0.527</span></span></code></pre>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/AIC.html" class="external-link">AIC</a></span><span class="op">(</span><span class="va">c3</span>, <span class="va">c0b</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##     df       AIC</span></span>
 <span><span class="co">## c3   7 -460.8564</span></span>
@@ -2433,14 +2449,14 @@ variable to check for asymmetries.</p>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Δ</mi><annotation encoding="application/x-tex">\Delta</annotation></semantics></math>AIC
 between the two models is quite drastic (&gt; 80), and the model with
 density as a continuous provides a better fit.</p>
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">cr_table</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">moved</span>, </span>
 <span>                            y <span class="op">=</span> <span class="va">cond_diff_30</span>,</span>
 <span>                            fill <span class="op">=</span> <span class="va">moved</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_boxplot.html" class="external-link">geom_boxplot</a></span><span class="op">(</span>coef <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>               outliers <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>               alpha <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Dispersal"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Relative change in condition"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Dispersed"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Relative change in condition"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html" class="external-link">ylim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.01</span>, <span class="fl">0.015</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_jitter.html" class="external-link">geom_jitter</a></span><span class="op">(</span>shape<span class="op">=</span><span class="fl">21</span>, position<span class="op">=</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_jitter.html" class="external-link">position_jitter</a></span><span class="op">(</span><span class="fl">0.02</span><span class="op">)</span>, alpha <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_discrete.html" class="external-link">scale_x_discrete</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NO"</span>, <span class="st">"YES"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -2458,14 +2474,14 @@ density as a continuous provides a better fit.</p>
 <pre><code><span><span class="co">## Warning: Removed 302 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">## (`geom_point()`).</span></span></code></pre>
 <p><img src="DME-020_Density_dependence_files/figure-html/unnamed-chunk-16-1.png" width="700"></p>
-<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># jpeg(file.path(here::here(), "vignettes", "condition_dispersal.jpeg"),</span></span>
 <span><span class="co">#      width = 3, height = 3.5, units = "in", res = 400)</span></span>
 <span><span class="co"># cdp</span></span>
 <span><span class="co"># dev.off()</span></span></code></pre></div>
 <p>Below we plot the results when treatment is considered as a factor
 (model that was discarded according to AIC values).</p>
-<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">newdata_cond</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html" class="external-link">expand.grid</a></span><span class="op">(</span>SL_0 <span class="op">=</span> <span class="va">sls</span>,</span>
 <span>                            treatment <span class="op">=</span> <span class="va">tts</span>,</span>
 <span>                            moved <span class="op">=</span> <span class="va">mv</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -2497,7 +2513,7 @@ density as a continuous provides a better fit.</p>
 individual of lower condition disperse, we will run here a model where
 <em>initial</em> condition is the explanatory variable, and dispersal
 the response.</p>
-<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># first, I am testing whether initial condition affects dispersal</span></span>
 <span><span class="va">c_d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">glmer</a></span><span class="op">(</span><span class="va">moved</span> <span class="op">~</span> <span class="va">condition_0</span> <span class="op">+</span></span>
 <span>                   <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">marker_0</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">streamID</span><span class="op">)</span>,</span>
@@ -2505,7 +2521,7 @@ the response.</p>
 <span>             family <span class="op">=</span> <span class="st">"binomial"</span>,</span>
 <span>             na.action <span class="op">=</span> <span class="va">na.omit</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## boundary (singular) fit: see help('isSingular')</span></span></code></pre>
-<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">c_d</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Generalized linear mixed model fit by maximum likelihood (Laplace</span></span>
 <span><span class="co">##   Approximation) [glmerMod]</span></span>
@@ -2545,13 +2561,13 @@ no need to keep sex as a fixed effect.</p>
 <p>Initial condition significantly affects dispersal, with individuals
 in good condition more likely to disperse.</p>
 <p>Let’s now see if dispersal affects final condition.</p>
-<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d_c</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lmerTest/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span><span class="va">condition_1</span> <span class="op">~</span> <span class="va">moved</span> <span class="op">+</span></span>
 <span>                   <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">marker_0</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">streamID</span><span class="op">)</span>,</span>
 <span>                 data <span class="op">=</span> <span class="va">cr_table</span>,</span>
 <span>                 na.action <span class="op">=</span> <span class="va">na.omit</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## boundary (singular) fit: see help('isSingular')</span></span></code></pre>
-<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">d_c</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Linear mixed model fit by REML. t-tests use Satterthwaite's method [</span></span>
 <span><span class="co">## lmerModLmerTest]</span></span>
@@ -2588,7 +2604,7 @@ for the main effect of initial condition, and these were not significant
 (not even when initial condition is alone in the model). Density also
 did not have a significant effect on condition. Dispersal has a
 significant and negative effect on final condition.</p>
-<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">conds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>condition_0 <span class="op">=</span> <span class="fu">modelr</span><span class="fu">::</span><span class="fu"><a href="https://modelr.tidyverse.org/reference/seq_range.html" class="external-link">seq_range</a></span><span class="op">(</span><span class="va">cr_table</span><span class="op">$</span><span class="va">condition_0</span>, n <span class="op">=</span> <span class="fl">50</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/add_column.html" class="external-link">add_column</a></span><span class="op">(</span>predicted <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">plogis</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">c_d</span>, newdata <span class="op">=</span> <span class="va">.</span>, re.form <span class="op">=</span> <span class="op">~</span><span class="fl">0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -2622,7 +2638,7 @@ significant and negative effect on final condition.</p>
 <pre><code><span><span class="co">## Warning: Removed 282 rows containing non-finite outside the scale range</span></span>
 <span><span class="co">## (`stat_boxplot()`).</span></span></code></pre>
 <p><img src="DME-020_Density_dependence_files/figure-html/unnamed-chunk-20-1.png" width="700"></p>
-<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Plotting change in condition with dispersal and effect of initial condition on dispersal</span></span>
 <span><span class="fu"><a href="https://rpkgs.datanovia.com/ggpubr/reference/ggarrange.html" class="external-link">ggarrange</a></span><span class="op">(</span><span class="va">cdp</span>, <span class="va">c_dplot</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Warning: Removed 302 rows containing non-finite outside the scale range</span></span>
@@ -2632,8 +2648,8 @@ significant and negative effect on final condition.</p>
 <pre><code><span><span class="co">## Warning: Removed 248 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">## (`geom_point()`).</span></span></code></pre>
 <p><img src="DME-020_Density_dependence_files/figure-html/unnamed-chunk-20-2.png" width="700"></p>
-<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">jpeg</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"figures"</span>, <span class="st">"condition_by_dispersal.jpeg"</span><span class="op">)</span>,</span>
+<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">jpeg</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"figures"</span>, <span class="st">"condition_by_dispersal.jpeg"</span><span class="op">)</span>,</span>
 <span>     width <span class="op">=</span> <span class="fl">6</span>, height <span class="op">=</span> <span class="fl">3.5</span>, units <span class="op">=</span> <span class="st">"in"</span>, res <span class="op">=</span> <span class="fl">400</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rpkgs.datanovia.com/ggpubr/reference/ggarrange.html" class="external-link">ggarrange</a></span><span class="op">(</span><span class="va">cdp</span>, <span class="va">c_dplot</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Warning: Removed 302 rows containing non-finite outside the scale range</span></span>
@@ -2642,7 +2658,21 @@ significant and negative effect on final condition.</p>
 <span><span class="co">## (`geom_point()`).</span></span></code></pre>
 <pre><code><span><span class="co">## Warning: Removed 248 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">## (`geom_point()`).</span></span></code></pre>
-<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb80"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## agg_png </span></span>
+<span><span class="co">##       2</span></span></code></pre>
+<div class="sourceCode" id="cb82"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">tiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"figures"</span>, <span class="st">"publication figures"</span>, <span class="st">"Figure 6.tif"</span><span class="op">)</span>,</span>
+<span>     width <span class="op">=</span> <span class="fl">6</span>, height <span class="op">=</span> <span class="fl">3.5</span>, units <span class="op">=</span> <span class="st">"in"</span>, res <span class="op">=</span> <span class="fl">600</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rpkgs.datanovia.com/ggpubr/reference/ggarrange.html" class="external-link">ggarrange</a></span><span class="op">(</span><span class="va">cdp</span>, <span class="va">c_dplot</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning: Removed 302 rows containing non-finite outside the scale range</span></span>
+<span><span class="co">## (`stat_boxplot()`).</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: Removed 302 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">## (`geom_point()`).</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: Removed 248 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">## (`geom_point()`).</span></span></code></pre>
+<div class="sourceCode" id="cb86"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## agg_png </span></span>
 <span><span class="co">##       2</span></span></code></pre>
@@ -2653,13 +2683,13 @@ significant and negative effect on final condition.</p>
 <p>For condition too, as we did for growth, we could run a model to
 observe the short-term effects of habitat change for the individuals who
 did not disperse.</p>
-<div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb88"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ch0</span> <span class="op">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/pkg/lmerTest/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span><span class="va">cond_diff_30</span> <span class="op">~</span> <span class="va">density_factor</span><span class="op">*</span><span class="va">hshift</span> <span class="op">+</span></span>
 <span>                   <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">marker_seq</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">streamID</span><span class="op">)</span>,</span>
 <span>                 data <span class="op">=</span> <span class="va">cr_table</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="va">moved</span><span class="op">)</span>,</span>
 <span>                 na.action <span class="op">=</span> <span class="va">na.omit</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## boundary (singular) fit: see help('isSingular')</span></span></code></pre>
-<div class="sourceCode" id="cb80"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb90"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ch0</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Linear mixed model fit by REML. t-tests use Satterthwaite's method [</span></span>
 <span><span class="co">## lmerModLmerTest]</span></span>
@@ -2696,14 +2726,14 @@ did not disperse.</p>
 <span><span class="co">## dnsty_:TRUE -0.166 -0.633 -0.121</span></span>
 <span><span class="co">## optimizer (nloptwrap) convergence code: 0 (OK)</span></span>
 <span><span class="co">## boundary (singular) fit: see help('isSingular')</span></span></code></pre>
-<div class="sourceCode" id="cb82"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb92"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 3-way is not significant and there's too few datapoints.</span></span>
 <span><span class="va">ch0b</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lmerTest/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span><span class="va">cond_diff_30</span> <span class="op">~</span> <span class="op">(</span><span class="va">SL_0s</span> <span class="op">+</span> <span class="va">treatment</span> <span class="op">+</span> <span class="va">hshift</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span></span>
 <span>                   <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">marker_seq</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">streamID</span><span class="op">)</span>,</span>
 <span>                 data <span class="op">=</span> <span class="va">cr_table</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="va">moved</span><span class="op">)</span>,</span>
 <span>                 na.action <span class="op">=</span> <span class="va">na.omit</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## boundary (singular) fit: see help('isSingular')</span></span></code></pre>
-<div class="sourceCode" id="cb84"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb94"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ch0b</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Linear mixed model fit by REML. t-tests use Satterthwaite's method [</span></span>
 <span><span class="co">## lmerModLmerTest]</span></span>
@@ -2752,7 +2782,7 @@ did not disperse.</p>
 <span><span class="co">## trtmnI:TRUE  0.554  0.569 -0.528 -0.776 -0.728 -0.461  0.258 -0.624 -0.180</span></span>
 <span><span class="co">## optimizer (nloptwrap) convergence code: 0 (OK)</span></span>
 <span><span class="co">## boundary (singular) fit: see help('isSingular')</span></span></code></pre>
-<div class="sourceCode" id="cb86"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb96"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/AIC.html" class="external-link">AIC</a></span><span class="op">(</span><span class="va">ch0</span>, <span class="va">ch0b</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##      df       AIC</span></span>
 <span><span class="co">## ch0   7 -281.4055</span></span>
@@ -2764,7 +2794,7 @@ is large enough that we can pick one. The former is a better fit model,
 so we will consider that.</p>
 <p>The only significant term is the interaction between density and
 habitat shift.</p>
-<div class="sourceCode" id="cb88"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb98"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">labelss_hab</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"SAME HABITAT"</span>,</span>
 <span>                   <span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"CHANGED HABITAT"</span><span class="op">)</span></span>
 <span></span>
@@ -2783,15 +2813,15 @@ habitat shift.</p>
 <pre><code><span><span class="co">## Warning: Removed 246 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">## (`geom_point()`).</span></span></code></pre>
 <p><img src="DME-020_Density_dependence_files/figure-html/unnamed-chunk-22-1.png" width="700"></p>
-<div class="sourceCode" id="cb91"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">jpeg</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"condition_habitat.jpeg"</span><span class="op">)</span>,</span>
+<div class="sourceCode" id="cb101"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">jpeg</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"condition_habitat.jpeg"</span><span class="op">)</span>,</span>
 <span>     width <span class="op">=</span> <span class="fl">7</span>, height <span class="op">=</span> <span class="fl">5</span>, units <span class="op">=</span> <span class="st">"in"</span>, res <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span>
 <span><span class="va">chp</span></span></code></pre></div>
 <pre><code><span><span class="co">## Warning: Removed 246 rows containing non-finite outside the scale range</span></span>
 <span><span class="co">## (`stat_boxplot()`).</span></span>
 <span><span class="co">## Removed 246 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">## (`geom_point()`).</span></span></code></pre>
-<div class="sourceCode" id="cb93"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb103"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## agg_png </span></span>
 <span><span class="co">##       2</span></span></code></pre>
@@ -2857,7 +2887,7 @@ distributed, making</p>
 Var(r) = E(r)\newline
 Var(a) = E(a)
 $$</span></p>
-<div class="sourceCode" id="cb95"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb105"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">recruits</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="co"># only manipulated streams</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">streamID</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CL1"</span>, <span class="st">"CL2"</span>, <span class="st">"TL"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -2872,7 +2902,7 @@ $$</span></p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">patchID</span><span class="op">)</span>, <span class="va">adults_0</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## `summarise()` has grouped output by 'streamID'. You can override using the</span></span>
 <span><span class="co">## `.groups` argument.</span></span></code></pre>
-<div class="sourceCode" id="cb97"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb107"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># the increased density pools are missing the added extralimital individuals</span></span>
 <span><span class="co"># first, I will assign to each pool its treatment</span></span>
 <span><span class="va">patch_to_treat</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -2881,11 +2911,11 @@ $$</span></p>
 <span>  <span class="va">summarise</span></span></code></pre></div>
 <pre><code><span><span class="co">## `summarise()` has grouped output by 'streamID', 'patchID'. You can override</span></span>
 <span><span class="co">## using the `.groups` argument.</span></span></code></pre>
-<div class="sourceCode" id="cb99"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb109"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># I can now add the treatment info to the recruits table</span></span>
 <span><span class="va">recruits</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">patch_to_treat</span>, <span class="va">recruits</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Joining with `by = join_by(streamID, patchID)`</span></span></code></pre>
-<div class="sourceCode" id="cb101"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb111"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Now, I can count how many adults were added to the increased pool in each stream</span></span>
 <span><span class="va">introduced</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">treatment</span> <span class="op">==</span> <span class="st">"E"</span>, <span class="op">!</span><span class="va">isbabyMark</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -2905,7 +2935,7 @@ $$</span></p>
 <span>         recruit_1_var <span class="op">=</span> <span class="va">babies_1</span><span class="op">/</span><span class="op">(</span><span class="va">adults_1</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="va">babies_1</span><span class="op">/</span><span class="op">(</span><span class="va">adults_1</span><span class="op">^</span><span class="fl">3</span><span class="op">)</span>,</span>
 <span>         SE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">recruit_1_var</span> <span class="op">+</span> <span class="va">recruit_0_var</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Joining with `by = join_by(streamID)`</span></span></code></pre>
-<div class="sourceCode" id="cb103"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb113"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># last step, including the information on density as continuous factor</span></span>
 <span><span class="co"># instead of categorical variables</span></span>
 <span><span class="va">recruits</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">treatment_tab</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">patchID</span><span class="op">)</span>,<span class="va">recruits</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -2925,7 +2955,7 @@ $$</span></p>
 after, in the different treatments. Keep in mind that “recruitment” here
 is simply the ratio between individuals &lt;10 mm and adult
 individuals.</p>
-<div class="sourceCode" id="cb105"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb115"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">recruits</span>, </span>
 <span>             <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">density_factor</span>, </span>
 <span>                 y <span class="op">=</span> <span class="va">recruit_1</span> <span class="op">-</span> <span class="va">recruit_0</span>, </span>
@@ -2942,15 +2972,22 @@ individuals.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_continuous</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.5</span>, <span class="fl">0.</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_shape_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">16</span>,<span class="fl">17</span>,<span class="fl">15</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#DAA323"</span>, <span class="st">"#691E92"</span>, <span class="st">"#199958"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="st">"Recruitment difference (± SE)"</span>, x <span class="op">=</span> <span class="st">"Poportional change in density"</span>, </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="st">"Recruitment difference (± SE)"</span>, x <span class="op">=</span> <span class="st">"Proportional change in density"</span>, </span>
 <span>       color <span class="op">=</span> <span class="st">"Stream"</span>, linetype <span class="op">=</span> <span class="st">"Stream"</span>, shape <span class="op">=</span> <span class="st">"Stream"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">pr</span></span></code></pre></div>
 <p><img src="DME-020_Density_dependence_files/figure-html/unnamed-chunk-24-1.png" width="700"></p>
-<div class="sourceCode" id="cb106"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">jpeg</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"figures"</span>, <span class="st">"pool_level_recruitment.jpeg"</span><span class="op">)</span>,</span>
+<div class="sourceCode" id="cb116"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">jpeg</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"figures"</span>, <span class="st">"pool_level_recruitment.jpeg"</span><span class="op">)</span>,</span>
 <span>     width <span class="op">=</span> <span class="fl">5</span>, height <span class="op">=</span> <span class="fl">3.5</span>, units <span class="op">=</span> <span class="st">"in"</span>, res <span class="op">=</span> <span class="fl">400</span><span class="op">)</span></span>
+<span><span class="va">pr</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## agg_png </span></span>
+<span><span class="co">##       2</span></span></code></pre>
+<div class="sourceCode" id="cb118"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">tiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"figures"</span>, <span class="st">"publication figures"</span>, <span class="st">"Figure 2.tif"</span><span class="op">)</span>,</span>
+<span>     width <span class="op">=</span> <span class="fl">5</span>, height <span class="op">=</span> <span class="fl">3.5</span>, units <span class="op">=</span> <span class="st">"in"</span>, res <span class="op">=</span> <span class="fl">600</span><span class="op">)</span></span>
 <span><span class="va">pr</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## agg_png </span></span>
@@ -2965,7 +3002,7 @@ confounding two things: the effects of density in terms of dispersal
 density on recruitment.</p>
 <p>We can run here a very simple model to see if the trend is
 significant (despite having very few datapoints).</p>
-<div class="sourceCode" id="cb108"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb120"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">r_model0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">recruit_1</span> <span class="op">-</span> <span class="va">recruit_0</span><span class="op">)</span> <span class="op">~</span> <span class="va">density_factor</span>, data <span class="op">=</span> <span class="va">recruits</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Call:</span></span>
@@ -2985,7 +3022,7 @@ significant (despite having very few datapoints).</p>
 <span><span class="co">## Residual standard error: 0.1648 on 7 degrees of freedom</span></span>
 <span><span class="co">## Multiple R-squared:  0.6262, Adjusted R-squared:  0.5728 </span></span>
 <span><span class="co">## F-statistic: 11.73 on 1 and 7 DF,  p-value: 0.01107</span></span></code></pre>
-<div class="sourceCode" id="cb110"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb122"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">r_model0b</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">recruit_1</span> <span class="op">-</span> <span class="va">recruit_0</span><span class="op">)</span> <span class="op">~</span> <span class="va">treatment</span>, data <span class="op">=</span> <span class="va">recruits</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Call:</span></span>
@@ -3006,7 +3043,7 @@ significant (despite having very few datapoints).</p>
 <span><span class="co">## Residual standard error: 0.1815 on 6 degrees of freedom</span></span>
 <span><span class="co">## Multiple R-squared:  0.6117, Adjusted R-squared:  0.4823 </span></span>
 <span><span class="co">## F-statistic: 4.726 on 2 and 6 DF,  p-value: 0.05855</span></span></code></pre>
-<div class="sourceCode" id="cb112"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb124"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/AIC.html" class="external-link">AIC</a></span><span class="op">(</span><span class="va">r_model0</span>, <span class="va">r_model0b</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##           df       AIC</span></span>
 <span><span class="co">## r_model0   3 -3.170154</span></span>
@@ -3019,9 +3056,9 @@ expect.</p>
 </h2>
 <p>The last trait we can look at is Survival. We can approximate
 survival calculating recapture rate of individuals released.</p>
-<div class="sourceCode" id="cb114"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb126"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># first, we need a fresh and unmodified version of the cr_table</span></span>
-<span><span class="va">cr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"DME_cr_data.rds"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">cr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"DME_cr_data.rds"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># I also need to revise the treatment table so treatment "E" can be assigned to</span></span>
 <span><span class="co"># a density factor value</span></span>
@@ -3055,22 +3092,22 @@ survival calculating recapture rate of individuals released.</p>
 size and sex). I can adopt the same procedure as before, running the
 model twice and using density both as a factor and as a continuous
 value.</p>
-<div class="sourceCode" id="cb116"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb128"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">s0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">glmer</a></span><span class="op">(</span><span class="va">recaptured</span> <span class="op">~</span> <span class="va">SL_s</span><span class="op">*</span><span class="va">sex_stage</span><span class="op">*</span><span class="va">pool_density</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">streamID</span><span class="op">)</span>,</span>
 <span>           family <span class="op">=</span> <span class="st">"binomial"</span>,</span>
 <span>           data <span class="op">=</span> <span class="va">released</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## boundary (singular) fit: see help('isSingular')</span></span></code></pre>
-<div class="sourceCode" id="cb118"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb130"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">s1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">glmer</a></span><span class="op">(</span><span class="va">recaptured</span> <span class="op">~</span> <span class="op">(</span><span class="va">SL_s</span><span class="op">+</span><span class="va">sex_stage</span><span class="op">+</span><span class="va">pool_density</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">streamID</span><span class="op">)</span>,</span>
 <span>           family <span class="op">=</span> <span class="st">"binomial"</span>,</span>
 <span>           data <span class="op">=</span> <span class="va">released</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## boundary (singular) fit: see help('isSingular')</span></span></code></pre>
-<div class="sourceCode" id="cb120"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb132"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">s2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">glmer</a></span><span class="op">(</span><span class="va">recaptured</span> <span class="op">~</span> <span class="va">SL_s</span><span class="op">*</span><span class="va">sex_stage</span><span class="op">+</span><span class="va">sex_stage</span><span class="op">*</span><span class="va">pool_density</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">streamID</span><span class="op">)</span>,</span>
 <span>           family <span class="op">=</span> <span class="st">"binomial"</span>,</span>
 <span>           data <span class="op">=</span> <span class="va">released</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## boundary (singular) fit: see help('isSingular')</span></span></code></pre>
-<div class="sourceCode" id="cb122"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb134"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">s2</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Generalized linear mixed model fit by maximum likelihood (Laplace</span></span>
 <span><span class="co">##   Approximation) [glmerMod]</span></span>
@@ -3117,7 +3154,7 @@ value.</p>
 <span><span class="co">## sx_stgM:pl_  0.264 -0.089 -0.112 -0.419 -0.527  0.032 -0.023  0.319</span></span>
 <span><span class="co">## optimizer (Nelder_Mead) convergence code: 0 (OK)</span></span>
 <span><span class="co">## boundary (singular) fit: see help('isSingular')</span></span></code></pre>
-<div class="sourceCode" id="cb124"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb136"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># LRT</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova</a></span><span class="op">(</span><span class="va">s1</span>, <span class="va">s0</span>, test <span class="op">=</span> <span class="st">"Chisq"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Data: released</span></span>
@@ -3127,7 +3164,7 @@ value.</p>
 <span><span class="co">##    npar    AIC    BIC  logLik deviance  Chisq Df Pr(&gt;Chisq)</span></span>
 <span><span class="co">## s1   11 781.23 829.80 -379.62   759.23                     </span></span>
 <span><span class="co">## s0   13 781.94 839.33 -377.97   755.94 3.2959  2     0.1924</span></span></code></pre>
-<div class="sourceCode" id="cb126"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb138"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">s0b</span> <span class="op">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">glmer</a></span><span class="op">(</span><span class="va">recaptured</span> <span class="op">~</span> <span class="va">SL_s</span><span class="op">*</span><span class="va">sex_stage</span><span class="op">+</span><span class="va">sex_stage</span><span class="op">*</span><span class="va">pool_treatment</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">location</span><span class="op">)</span>,</span>
 <span>           family <span class="op">=</span> <span class="st">"binomial"</span>,</span>
 <span>           data <span class="op">=</span> <span class="va">released</span><span class="op">)</span></span>
@@ -3205,14 +3242,14 @@ value.</p>
 <span><span class="co">## sx_stgM:pl_trtmntd                   </span></span>
 <span><span class="co">## sx_stgI:pl_trtmntn                   </span></span>
 <span><span class="co">## sx_stgM:pl_trtmntn  0.263</span></span></code></pre>
-<div class="sourceCode" id="cb128"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb140"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/AIC.html" class="external-link">AIC</a></span><span class="op">(</span><span class="va">s0</span>, <span class="va">s0b</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##     df      AIC</span></span>
 <span><span class="co">## s0  13 781.9368</span></span>
 <span><span class="co">## s0b 13 782.8971</span></span></code></pre>
 <p>Given the difference in AIC value is larger than 4, I will consider
 the model with density as a continuous value</p>
-<div class="sourceCode" id="cb130"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb142"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># plotting</span></span>
 <span><span class="va">mean_s</span> <span class="op">&lt;-</span> <span class="va">released</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">streamID</span>, <span class="va">pool_treatment</span>, <span class="va">pool_density</span>, <span class="va">sex_stage</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -3232,7 +3269,7 @@ the model with density as a continuous value</p>
 <span>         lowerCI <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">lowerCI</span> <span class="op">&lt;</span> <span class="fl">0</span> , <span class="fl">0</span>, <span class="va">lowerCI</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## `summarise()` has grouped output by 'streamID', 'pool_treatment',</span></span>
 <span><span class="co">## 'pool_density'. You can override using the `.groups` argument.</span></span></code></pre>
-<div class="sourceCode" id="cb132"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb144"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">mean_s</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">pool_density</span>, y <span class="op">=</span> <span class="va">survival</span>, </span>
 <span>                        group <span class="op">=</span> <span class="va">stream</span>, color <span class="op">=</span> <span class="va">stream</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="va">stream</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">3</span>,</span>
@@ -3253,9 +3290,16 @@ the model with density as a continuous value</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">p</span></span></code></pre></div>
 <p><img src="DME-020_Density_dependence_files/figure-html/unnamed-chunk-28-1.png" width="700"></p>
-<div class="sourceCode" id="cb133"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">jpeg</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"figures"</span>, <span class="st">"pool_level_survival.jpeg"</span><span class="op">)</span>,</span>
+<div class="sourceCode" id="cb145"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">jpeg</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"figures"</span>, <span class="st">"pool_level_survival.jpeg"</span><span class="op">)</span>,</span>
 <span>     width <span class="op">=</span> <span class="fl">8</span>, height <span class="op">=</span> <span class="fl">5</span>, units <span class="op">=</span> <span class="st">"in"</span>, res <span class="op">=</span> <span class="fl">400</span><span class="op">)</span></span>
+<span><span class="va">p</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## agg_png </span></span>
+<span><span class="co">##       2</span></span></code></pre>
+<div class="sourceCode" id="cb147"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">tiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"figures"</span>, <span class="st">"publication figures"</span>, <span class="st">"Figure 1.tif"</span><span class="op">)</span>,</span>
+<span>     width <span class="op">=</span> <span class="fl">8</span>, height <span class="op">=</span> <span class="fl">5</span>, units <span class="op">=</span> <span class="st">"in"</span>, res <span class="op">=</span> <span class="fl">600</span><span class="op">)</span></span>
 <span><span class="va">p</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## agg_png </span></span>

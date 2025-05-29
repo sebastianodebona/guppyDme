@@ -55,16 +55,16 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/DME-000_Tidy_data.html">Spread and Shrink Dataset</a>
+      <a href="../articles/DME-000_Tidy_data.html">Tidy the Data</a>
     </li>
     <li>
-      <a href="../articles/DME-011_Measurement_consistency.html">Measurement consistency</a>
+      <a href="../articles/DME-011_Measurement_consistency.html">Measurement Consistency</a>
     </li>
     <li>
-      <a href="../articles/DME-010_Habitat_characteristics.html">Habitat characteristics</a>
+      <a href="../articles/DME-010_Habitat_characteristics.html">Habitat Characteristics</a>
     </li>
     <li>
-      <a href="../articles/DME-015_Habitat_area.html">Habitat area</a>
+      <a href="../articles/DME-015_Habitat_area.html">Habitat Area</a>
     </li>
     <li>
       <a href="../articles/DME-016_Dispersal_and_habitat_shift.html">Dispersal and Habitat shift</a>
@@ -83,7 +83,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://gitlab.com/sebadebona/guppyDME" class="external-link">
+  <a href="https://github.com/sebastianodebona/guppyDme" class="external-link">
     <span class="fa fa-github fa-lg"></span>
 
   </a>
@@ -106,7 +106,7 @@
 Bona</h4>
             
       
-      <small class="dont-index">Source: <a href="https://gitlab.com/sebadebona/density-manipulation-experiment/blob/HEAD/vignettes/DME-011_Measurement_consistency.Rmd" class="external-link"><code>vignettes/DME-011_Measurement_consistency.Rmd</code></a></small>
+
       <div class="hidden name"><code>DME-011_Measurement_consistency.Rmd</code></div>
 
     </div>
@@ -148,14 +148,14 @@ to insure growth is measured accurately.</p>
 <span></span>
 <span><span class="co">#### If you have the guppyDme package installed</span></span>
 <span><span class="co"># loading package</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://gitlab.com/sebadebona/density-manipulation-experiment" class="external-link">guppyDme</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sebastianodebona.github.io/guppyDme/">guppyDme</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># # If you do NOT wish to install the guppyDme package, please uncomment and run the following two lines of code, adding the package functions to the Global Environment and loading the data</span></span>
 <span><span class="co"># source(file.path(here::here(), "R", "package_functions.R"))</span></span>
 <span><span class="co"># load(file.path(here::here(), "data", "DMEdata.rda"))</span></span>
 <span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">DMEdata</span></span>
-<span><span class="va">cr_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"DME_cr_data.rds"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">cr_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"DME_cr_data.rds"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Let’s see how many marking events there are, sorted by
 capture/recapture, and check if any difference in the average length
 measured is visible, and if it’s significant.</p>

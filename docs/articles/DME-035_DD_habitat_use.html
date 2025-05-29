@@ -55,16 +55,16 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/DME-000_Tidy_data.html">Spread and Shrink Dataset</a>
+      <a href="../articles/DME-000_Tidy_data.html">Tidy the Data</a>
     </li>
     <li>
-      <a href="../articles/DME-011_Measurement_consistency.html">Measurement consistency</a>
+      <a href="../articles/DME-011_Measurement_consistency.html">Measurement Consistency</a>
     </li>
     <li>
-      <a href="../articles/DME-010_Habitat_characteristics.html">Habitat characteristics</a>
+      <a href="../articles/DME-010_Habitat_characteristics.html">Habitat Characteristics</a>
     </li>
     <li>
-      <a href="../articles/DME-015_Habitat_area.html">Habitat area</a>
+      <a href="../articles/DME-015_Habitat_area.html">Habitat Area</a>
     </li>
     <li>
       <a href="../articles/DME-016_Dispersal_and_habitat_shift.html">Dispersal and Habitat shift</a>
@@ -83,7 +83,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://gitlab.com/sebadebona/guppyDME" class="external-link">
+  <a href="https://github.com/sebastianodebona/guppyDme" class="external-link">
     <span class="fa fa-github fa-lg"></span>
 
   </a>
@@ -106,7 +106,7 @@
 Bona</h4>
             
       
-      <small class="dont-index">Source: <a href="https://gitlab.com/sebadebona/density-manipulation-experiment/blob/HEAD/vignettes/DME-035_DD_habitat_use.Rmd" class="external-link"><code>vignettes/DME-035_DD_habitat_use.Rmd</code></a></small>
+
       <div class="hidden name"><code>DME-035_DD_habitat_use.Rmd</code></div>
 
     </div>
@@ -198,7 +198,7 @@ easier).</p>
 <span></span>
 <span><span class="co">#### If you have the guppyDme package installed</span></span>
 <span><span class="co"># loading package</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://gitlab.com/sebadebona/density-manipulation-experiment" class="external-link">guppyDme</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sebastianodebona.github.io/guppyDme/">guppyDme</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># # If you do NOT wish to install the guppyDme package, please uncomment and run the following two lines of code, adding the package functions to the Global Environment and loading the data</span></span>
 <span><span class="co"># source(file.path(here::here(), "R", "package_functions.R"))</span></span>
@@ -206,8 +206,8 @@ easier).</p>
 <span></span>
 <span><span class="co"># loading data</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">DMEdata</span></span>
-<span><span class="va">pool_comp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"DME_pool_composition.rds"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">treatment_tab</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"DME_density_factor_in_treatments.rds"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">pool_comp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"DME_pool_composition.rds"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">treatment_tab</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"DME_density_factor_in_treatments.rds"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># I am creating an additional column in the dataset, redefining sex_stage classes</span></span>
 <span><span class="co"># I am also transforming SL into numeric, substituting the "&lt;10", and </span></span>
@@ -452,7 +452,7 @@ The number of interactions is likely a little too big.</p>
 <span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/add_column.html" class="external-link">add_column</a></span><span class="op">(</span>coeff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">dcmodel</span><span class="op">)</span><span class="op">$</span><span class="va">CoefTable</span><span class="op">)</span><span class="op">)</span>, .before <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
 <span></span>
-<span><span class="va">rtffile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rtf/man/RTF.html" class="external-link">RTF</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"DCM_output.doc"</span><span class="op">)</span><span class="op">)</span>  <span class="co"># this can be an .rtf or a .doc</span></span>
+<span><span class="va">rtffile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rtf/man/RTF.html" class="external-link">RTF</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"DCM_output.doc"</span><span class="op">)</span><span class="op">)</span>  <span class="co"># this can be an .rtf or a .doc</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/rtf/man/Non-documented_objects.html" class="external-link">addTable</a></span><span class="op">(</span><span class="va">rtffile</span>, <span class="va">ptable</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/rtf/man/Non-documented_objects.html" class="external-link">done</a></span><span class="op">(</span><span class="va">rtffile</span><span class="op">)</span></span></code></pre></div>
 <p>The interpretation of the results is somewhat tricky, so we will plot
@@ -517,7 +517,7 @@ time also including the density values.</p>
 <span><span class="va">hcp</span></span></code></pre></div>
 <p><img src="DME-035_DD_habitat_use_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">jpeg</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"figures"</span>, <span class="st">"habitat_choice.jpeg"</span><span class="op">)</span>,</span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">jpeg</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vignettes"</span>, <span class="st">"figures"</span>, <span class="st">"habitat_choice.jpeg"</span><span class="op">)</span>,</span>
 <span>     width <span class="op">=</span> <span class="fl">8</span>, height <span class="op">=</span> <span class="fl">6</span>, units <span class="op">=</span> <span class="st">"in"</span>, res <span class="op">=</span> <span class="fl">400</span><span class="op">)</span></span>
 <span><span class="va">hcp</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
